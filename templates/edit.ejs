@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+    }
+
+    .wrapper {
+        padding: 0;
+        margin: 0;
+        min-height: 100%;
+        height: 100%;
+        display: flex;
+        box-sizing: border-box;
+    }
+
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0;
+        margin: 0;
+        border: 10px solid #cbd5e0;
+        min-height: 100%;
+        height: 100%;
+        width: 100%;
+        box-sizing: border-box;
+
+        background-color: #cbd5e0;
+    }
+
+    .container_left {
+        min-height: 100%;
+        height: 100%;
+        min-width: 150px;
+        width:35%;
+
+        padding: 0;
+        margin: 0;
+
+        align-items: center;
+        justify-content: center;
+        
+        box-sizing: border-box;
+
+        background-color: #cbd5e0;
+    }
+
+    .container_right {
+        min-height: 100%;
+        height: 100%;
+        min-width: 150px;
+
+        flex-grow: 1;
+
+        padding: 20px;
+        margin: 0;
+
+        align-items: center;
+        justify-content: center;
+        
+        box-sizing: border-box;
+
+        background-color: white;
+        border: solid 1px #AAA;
+    }
+
+    .container_resizer {
+        width:10px;
+        min-height:20px;
+        cursor: ew-resize;
+
+        box-sizing: border-box;
+        background-color: #cbd5e0;
+    }
+
+    button { 
+        border-top: solid 1px #EEE;
+        border-left: solid 1px #EEE;
+        border-bottom: solid 1px #999;
+        border-right: solid 1px #999;
+        background-color: #BFBFBF; 
+    }
+
+    button:hover {
+        background-color: #CFCFCF;
+    }
+
+    button:active { 
+        border-right: solid 1px #EEE;
+        border-bottom: solid 1px #EEE;
+        border-left: solid 1px #999;
+        border-top: solid 1px #999;
+        background-color: #CFCFCF; 
+    }
+
+</style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="container">
+        <div class="container_left">
+            <div style="display:flex; flex-direction:column; height:100%; padding:0; margin:0; box-sizing: border-box;">
+                <textarea style="height:100%; width:100%; flex-grow: 1; box-sizing: border-box;" id="txtDiagramData"><%= diagram.data %></textarea>
+
+                <div style="display:flex; flex-direction:row; height:50px; padding:0; margin:0; box-sizing: border-box; margin-top:10px;">
+                    <button style="height:50px; width:50%; flex-grow: 1; box-sizing: border-box; margin-right: 5px;" id="btnSave">Save</button>
+                    <button style="height:50px; width:50%; flex-grow: 1; box-sizing: border-box; margin-left: 5px;" id="btnUpdate">Render</button>
+                </div>
+
+            </div>
+        </div>
+        <div class="container_resizer" id="split_view_resize_handle"></div>
+        <div class="container_right" style="overflow: scroll;">
+            <div id="diagram_area"></div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.esm.min.mjs";
+mermaid.initialize({ startOnLoad: true });
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    const resizer = document.getElementById('split_view_resize_handle');
+    const leftPanel = resizer.previousElementSibling;
+    const rightPanel = resizer.nextElementSibling;
+
+    let mouse_track_x = 0;
+    let mouse_track_y = 0;
+    let resizer_leftWidth = 0;
+
+    const resizer_mousedown = function(e) {
+
+        mouse_track_x = e.clientX;
+        mouse_track_y = e.clientY;
+
+        resizer_leftWidth = leftPanel.getBoundingClientRect().width;
+
+        document.addEventListener('mousemove', resizer_mousemove);
+        document.addEventListener('mouseup', resizer_mouseup);
+
+        //resizer.style.cursor = 'col-resize';
+        //document.body.style.cursor = 'col-resize';
+
+        leftPanel.style.userSelect = 'none';
+        rightPanel.style.userSelect = 'none';
+        
+        leftPanel.style.pointerEvents = 'none';
+        rightPanel.style.pointerEvents = 'none';
+    }
+
+    const resizer_mousemove = function(e) {
+
+        const dx = e.clientX - mouse_track_x;
+        const dy = e.clientY - mouse_track_y;
+        
+        const newLeftWidth = Math.min(((resizer_leftWidth + dx) * 100) / resizer.parentNode.getBoundingClientRect().width, 75.0);
+        leftPanel.style.width = `${newLeftWidth}%`;
+    }
+
+    const resizer_mouseup = function(e) {
+
+        //resizer.style.cursor = 'cursor';
+        //document.body.style.cursor = 'cursor';
+
+        leftPanel.style.userSelect = 'all';
+        rightPanel.style.userSelect = 'all';
+
+        leftPanel.style.pointerEvents = 'auto';
+        rightPanel.style.pointerEvents = 'auto';
+
+
+        //leftPanel.style.removeProperty('pointerEvents');
+        //rightPanel.style.removeProperty('pointerEvents');
+
+        document.removeEventListener('mousemove', resizer_mousemove);
+        document.removeEventListener('mouseup', resizer_mouseup);
+
+        console.log(leftPanel.style);
+        console.log('here');
+    }
+
+    resizer.addEventListener('mousedown', resizer_mousedown);
+
+    document.getElementById('btnUpdate').addEventListener('click', function() {
+        let txtDiagramData = document.getElementById('txtDiagramData');
+        let diagram_area = document.getElementById('diagram_area');
+
+        mermaid.render('x', txtDiagramData.value, function(svg) {
+            diagram_area.innerHTML = svg;
+        });
+    });
+
+    document.getElementById('btnSave').addEventListener('click', function() {
+       
+        let txtDiagramData = document.getElementById('txtDiagramData');
+        let diagram_area = document.getElementById('diagram_area');
+
+        //document.getElementById('diagram_area').firstChild.setAttribute("viewBox", "0 0 1995 2601"); 
+        //document.getElementById('diagram_area').firstChild.style.width="200%";
+        //document.getElementById('diagram_area').firstChild.viewBox.baseVal.width // 1995
+        //document.getElementById('diagram_area').getBoundingClientRect().width // 1077.671875
+
+        if (document.getElementById('diagram_area').firstChild.style.width != "100%") {
+            document.getElementById('diagram_area').firstChild.style.width=`100%`;
+        }
+        else {
+            var viewAreaWidth = document.getElementById('diagram_area').getBoundingClientRect().width;
+            var diagramWidth = document.getElementById('diagram_area').firstChild.viewBox.baseVal.width;
+            var fullZoom = Math.max(diagramWidth/viewAreaWidth, 1)*100;
+            
+            document.getElementById('diagram_area').firstChild.style.width=`${fullZoom}%`;
+        }
+        /*postData('/diagrams/<%= diagram.id %>/update', { data: txtDiagramData.value }).then(function(data) {
+            console.log(data); // JSON data parsed by `data.json()` call
+ 
+            alert(data['status'] == 'OK' ? 'Saved successfully' : 'Error?');
+        });*/
+    });
+
+    async function postData(url = '', data = {}) {
+
+        const response = await fetch(url, {
+            method: 'POST',
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+            'Content-Type': 'application/json'
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            body: JSON.stringify(data) // body data type must match "Content-Type" header
+        });
+        
+        return response.json(); // parses JSON response into native JavaScript objects
+    }
+
+});
+
+</script>
+
+</body>
+</html>
