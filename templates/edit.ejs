@@ -17,7 +17,7 @@
         box-sizing: border-box;
     }
 
-    .container {
+    .split-panel-container {
         display: flex;
         flex-wrap: wrap;
         padding: 0;
@@ -31,7 +31,7 @@
         background-color: #cbd5e0;
     }
 
-    .container_left {
+    .split-panel-container-left {
         min-height: 100%;
         height: 100%;
         min-width: 150px;
@@ -48,7 +48,7 @@
         background-color: #cbd5e0;
     }
 
-    .container_right {
+    .split-panel-container-right {
         min-height: 100%;
         height: 100%;
         min-width: 150px;
@@ -67,7 +67,7 @@
         border: solid 1px #AAA;
     }
 
-    .container_resizer {
+    .split-panel-container-resizer {
         width:10px;
         min-height:20px;
         cursor: ew-resize;
@@ -81,11 +81,11 @@
         border-left: solid 1px #EEE;
         border-bottom: solid 1px #999;
         border-right: solid 1px #999;
-        background-color: #BFBFBF; 
+        background-color: #CFCFCF; 
     }
 
     button:hover {
-        background-color: #CFCFCF;
+        background-color: #BFBFBF;
     }
 
     button:active { 
@@ -93,15 +93,15 @@
         border-bottom: solid 1px #EEE;
         border-left: solid 1px #999;
         border-top: solid 1px #999;
-        background-color: #CFCFCF; 
+        background-color: #BFBFBF; 
     }
 
 </style>
 </head>
 <body>
 <div class="wrapper">
-    <div class="container">
-        <div class="container_left">
+    <div class="split-panel-container">
+        <div class="split-panel-container-left">
             <div style="display:flex; flex-direction:column; height:100%; padding:0; margin:0; box-sizing: border-box;">
                 <textarea style="height:100%; width:100%; flex-grow: 1; box-sizing: border-box;" id="txtDiagramData"><%= diagram.data %></textarea>
 
@@ -112,9 +112,11 @@
 
             </div>
         </div>
-        <div class="container_resizer" id="split_view_resize_handle"></div>
-        <div class="container_right" style="overflow: scroll;">
-            <div id="diagram_area"></div>
+        <div class="split-panel-container-resizer" id="split_view_resize_handle"></div>
+        <div class="split-panel-container-right" style="overflow: scroll;">
+            <h1 style="position:relative; margin:0 0 20px 0; font-family:sans-serif; font-size:20px; padding-bottom:15px; border-bottom:solid 1px #E4E4E4;"><%= diagram.name %></h1>
+            <div id="diagram_area" style="margin-top:0px;"></div>
+            <button style="position:absolute; top:30px; right:50px; padding:5px 18px;" id="btnZoom">Zoom</button>
         </div>
     </div>
 </div>
@@ -186,18 +188,59 @@ document.addEventListener('DOMContentLoaded', function() {
 
     resizer.addEventListener('mousedown', resizer_mousedown);
 
-    document.getElementById('btnUpdate').addEventListener('click', function() {
+    function tryRender() {
+
         let txtDiagramData = document.getElementById('txtDiagramData');
         let diagram_area = document.getElementById('diagram_area');
 
-        mermaid.render('x', txtDiagramData.value, function(svg) {
-            diagram_area.innerHTML = svg;
+        let oldScrollTop = diagram_area.parentElement.scrollTop;
+        let oldScrollLeft = diagram_area.parentElement.scrollLeft;
+
+        try {
+            mermaid.render('x', txtDiagramData.value, function(svg) {
+
+                if (!svg.startsWith('<svg aria-roledescription="error"')) {
+
+                    diagram_area.innerHTML = svg;
+
+                    if (zoomed) {
+                        let viewAreaWidth = diagram_area.getBoundingClientRect().width;
+                        let diagramWidth = diagram_area.firstChild.viewBox.baseVal.width;
+                        let fullZoom = Math.max(diagramWidth/viewAreaWidth, 1)*100;
+                        
+                        diagram_area.firstChild.style.width=`${fullZoom}%`;
+                        
+                        diagram_area.parentElement.scrollTop = oldScrollTop;
+                        diagram_area.parentElement.scrollLeft = oldScrollLeft;
+                    }
+                }
+            });
+        }
+        catch(e)
+        {
+            alert(e);
+        }
+    }
+
+    document.getElementById('btnUpdate').addEventListener('click', function() {
+        tryRender();
+    });
+
+    tryRender(); // Render the initial data on page load
+
+    document.getElementById('btnSave').addEventListener('click', async function() {
+       
+        let txtDiagramData = document.getElementById('txtDiagramData');
+
+        await postData('/diagrams/<%= diagram.id %>/update', { data: txtDiagramData.value }).then(function(data) { 
+            alert(data['status'] == 'OK' ? 'Saved successfully' : 'Error?');
         });
     });
 
-    document.getElementById('btnSave').addEventListener('click', function() {
+    var zoomed = false;
+
+    document.getElementById('btnZoom').addEventListener('click', function() {
        
-        let txtDiagramData = document.getElementById('txtDiagramData');
         let diagram_area = document.getElementById('diagram_area');
 
         //document.getElementById('diagram_area').firstChild.setAttribute("viewBox", "0 0 1995 2601"); 
@@ -205,21 +248,19 @@ document.addEventListener('DOMContentLoaded', function() {
         //document.getElementById('diagram_area').firstChild.viewBox.baseVal.width // 1995
         //document.getElementById('diagram_area').getBoundingClientRect().width // 1077.671875
 
-        if (document.getElementById('diagram_area').firstChild.style.width != "100%") {
-            document.getElementById('diagram_area').firstChild.style.width=`100%`;
+        if (zoomed) {
+            diagram_area.firstChild.style.width=`100%`;
         }
         else {
-            var viewAreaWidth = document.getElementById('diagram_area').getBoundingClientRect().width;
-            var diagramWidth = document.getElementById('diagram_area').firstChild.viewBox.baseVal.width;
-            var fullZoom = Math.max(diagramWidth/viewAreaWidth, 1)*100;
-            
-            document.getElementById('diagram_area').firstChild.style.width=`${fullZoom}%`;
+            let viewAreaWidth = diagram_area.getBoundingClientRect().width;
+            let diagramWidth = diagram_area.firstChild.viewBox.baseVal.width;
+            let fullZoom = Math.max(diagramWidth/viewAreaWidth, 1)*100;
+           
+            diagram_area.firstChild.style.width=`${fullZoom}%`;
         }
-        /*postData('/diagrams/<%= diagram.id %>/update', { data: txtDiagramData.value }).then(function(data) {
-            console.log(data); // JSON data parsed by `data.json()` call
- 
-            alert(data['status'] == 'OK' ? 'Saved successfully' : 'Error?');
-        });*/
+
+        zoomed = !zoomed;
+
     });
 
     async function postData(url = '', data = {}) {
@@ -230,8 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
             credentials: 'same-origin', // include, *same-origin, omit
             headers: {
-            'Content-Type': 'application/json'
-            // 'Content-Type': 'application/x-www-form-urlencoded',
+              'Content-Type': 'application/json' // 'application/x-www-form-urlencoded',
             },
             redirect: 'follow', // manual, *follow, error
             referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
