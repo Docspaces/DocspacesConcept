@@ -97,13 +97,30 @@
     }
 
 </style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.min.css" integrity="sha512-GzcoZD7y5zvBofYtImXPZaPVhoY7xLPt+ysmbPb/vU+quSKFkcngxaSrxuwprDZL4MALUqGFmnqCxQZqMozv1Q==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script>
+    var require = {
+        paths: {
+            vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs'
+        }
+    };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js" integrity="sha512-6bIYsGqvLpAiEBXPdRQeFf5cueeBECtAKJjIHer3BhBZNTV3WLcLA8Tm3pDfxUwTMIS+kAZwTUvJ1IrMdX8C5w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.nls.min.js" integrity="sha512-CCv+DKWw+yZhxf4Z+ExT6HC5G+3S45TeMTYcJyYbdrv4BpK2vyALJ4FoVR/KGWDIPu7w4tNCOC9MJQIkYPR5FA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" type="text/css" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/editor/editor.main.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.js" integrity="sha512-BtSZPhzoyN8kq1axY6cgOFPSgLJgFwvAZ3WxeDGxEFXeFcFuK2s7Hr+zF75npVHASUY1dxudAfIVzwmgdR89Bw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<meta http-equiv="content-security-policy" content="">
+
 </head>
 <body>
 <div class="wrapper">
     <div class="split-panel-container">
         <div class="split-panel-container-left">
             <div style="display:flex; flex-direction:column; height:100%; padding:0; margin:0; box-sizing: border-box;">
-                <textarea style="height:100%; width:100%; flex-grow: 1; box-sizing: border-box;" id="txtDiagramData"><%= diagram.data %></textarea>
+                <!--<textarea style="height:100%; width:100%; flex-grow: 1; box-sizing: border-box;" id="txtDiagramData"><%= diagram.data %></textarea>
+                -->
+                <div style="height:100%; width:100%; flex-grow: 1; box-sizing: border-box; display:flexbox; background-color: yellow;" id="txtDiagramData"></div>
 
                 <div style="display:flex; flex-direction:row; height:50px; padding:0; margin:0; box-sizing: border-box; margin-top:10px;">
                     <button style="height:50px; width:50%; flex-grow: 1; box-sizing: border-box; margin-right: 5px;" id="btnSave">Save</button>
@@ -196,8 +213,10 @@ document.addEventListener('DOMContentLoaded', function() {
         let oldScrollTop = diagram_area.parentElement.scrollTop;
         let oldScrollLeft = diagram_area.parentElement.scrollLeft;
 
+        //debugger;
+
         try {
-            mermaid.render('x', txtDiagramData.value, function(svg) {
+            mermaid.render('x', editor.getValue(), function(svg) {
 
                 if (!svg.startsWith('<svg aria-roledescription="error"')) {
 
@@ -226,15 +245,14 @@ document.addEventListener('DOMContentLoaded', function() {
         tryRender();
     });
 
-    tryRender(); // Render the initial data on page load
-
     document.getElementById('btnSave').addEventListener('click', async function() {
        
         let txtDiagramData = document.getElementById('txtDiagramData');
 
-        await postData('/diagrams/<%= diagram.id %>/update', { data: txtDiagramData.value }).then(function(data) { 
+        await postData('/diagrams/<%= diagram.id %>/update', { data: editor.getValue() }).then(function(data) { 
             alert(data['status'] == 'OK' ? 'Saved successfully' : 'Error?');
         });
+        
     });
 
     var zoomed = false;
@@ -280,6 +298,180 @@ document.addEventListener('DOMContentLoaded', function() {
         
         return response.json(); // parses JSON response into native JavaScript objects
     }
+
+
+// Register a new language
+monaco.languages.register({ id: 'mermaid' });
+
+// Register a tokens provider for the language
+monaco.languages.setMonarchTokensProvider('mermaid', {
+
+    keywords: {
+        sequenceDiagram: {
+            typeKeywords: ['sequenceDiagram'],
+            blockKeywords: [
+                'alt',
+                'par',
+                'and',
+                'loop',
+                'else',
+                'end',
+                'rect',
+                'opt',
+                'alt',
+                'rect',
+            ],
+            keywords: [
+                'participant',
+                'as',
+                'Note',
+                'note',
+                'right of',
+                'left of',
+                'over',
+                'activate',
+                'deactivate',
+                'autonumber',
+                'title',
+                'actor',
+                'accDescription',
+                'link',
+                'links',
+            ]
+        }
+    },
+
+    sequenceDiagramBlockKeywords: ['alt',
+                'par',
+                'and',
+                'loop',
+                'else',
+                'end',
+                'rect',
+                'opt',
+                'alt',
+                'rect'],
+sequenceDiagramKeywords: ['participant',
+                'as',
+                'Note',
+                'note',
+                'right of',
+                'left of',
+                'over',
+                'activate',
+                'deactivate',
+                'autonumber',
+                'title',
+                'actor',
+                'accDescription',
+                'link',
+                'links'],
+
+	tokenizer: {
+		root: [
+			[/^\s*sequenceDiagram/, 'typeKeyword', 'sequenceDiagram'],
+		],
+            sequenceDiagram: [
+                [/(title:?|accDescription)([^\r\n;]*$)/, ['keyword', 'string']],
+                [/(autonumber)([^\r\n\S]+off[^\r\n\S]*$)/, ['keyword', 'keyword']],
+                [
+                    /(autonumber)([^\r\n\S]+\d+[^\r\n\S]+\d+[^\r\n\S]*$)/,
+                    ['keyword', 'number'],
+                ],
+                [/(autonumber)([^\r\n\S]+\d+[^\r\n\S]*$)/, ['keyword', 'number']],
+                [
+                    /(link\s+)(.*?)(:)(\s*.*?)(\s*@)(\s*[^\r\n;]+)/,
+                    [
+                        'keyword',
+                        'variable',
+                        'delimiter.bracket',
+                        'string',
+                        'delimiter.bracket',
+                        'string',
+                    ],
+                ],
+                [
+                    /((?:links|properties)\s+)([^\r\n:]*?)(:\s+)/,
+                    [
+                        { token: 'keyword' },
+                        { token: 'variable' },
+                        {
+                            token: 'delimiter.bracket',
+                            nextEmbedded: 'javascript',
+                            next: '@sequenceDiagramLinksProps'
+                        },
+                    ],
+                ],
+                [
+                    /[a-zA-Z][\w$]*/,
+                    {
+                        cases: {
+                            '@sequenceDiagramBlockKeywords': 'typeKeyword',
+                            '@sequenceDiagramKeywords': 'keyword',
+                            '@default': 'variable'
+                        }
+                    },
+                ],
+                [/(--?>?>|--?[)x])[+-]?/, 'transition'],
+                [/(:)([^:\n]*?$)/, ['delimiter.bracket', 'string']],
+                [/%%[^$]([^%]*(?!%%$)%?)*$/, 'comment'],
+            ],
+            sequenceDiagramLinksProps: [
+                // [/^:/, { token: 'delimiter.bracket', nextEmbedded: 'json' }],
+                [
+                    /$|;/,
+                    { nextEmbedded: '@pop', next: '@pop', token: 'delimiter.bracket' },
+                ],
+            ]
+	}
+});
+
+// Define a new theme that contains only rules that match this language
+monaco.editor.defineTheme('mermaid', {
+	base: 'vs',
+	inherit: false,
+	rules: [
+		{ token: 'typeKeyword', foreground: '8040DD', fontStyle: 'bold' },
+		{ token: 'transition', foreground: '000000', fontStyle: 'bold' },
+		{ token: 'keyword', foreground: '8040DD', fontStyle: 'bold' },
+		{ token: 'variable', foreground: '880000', fontStyle: 'bold' },
+		{ token: 'string', foreground: '303030', fontStyle: 'bold' }
+	],
+	colors: {
+		'editor.foreground': '#000000'
+	}
+});
+
+// Register a completion item provider for the new language
+monaco.languages.registerCompletionItemProvider('mermaid', {
+	provideCompletionItems: () => {
+		var suggestions = [
+			{
+				label: 'sequenceDiagram',
+				kind: monaco.languages.CompletionItemKind.Keyword,
+				insertText: 'sequenceDiagram'
+			}
+		];
+		return { suggestions: suggestions };
+	}
+});
+
+
+
+
+
+    var editor = monaco.editor.create(document.getElementById('txtDiagramData'), {
+					value: `<%- diagram.data %>`,
+                    automaticLayout: true,
+                    language: 'mermaid',
+                    theme: 'mermaid',
+                    minimap: {
+                		enabled: false
+	                }
+				});
+    
+    tryRender(); // Render the initial data on page load
+
 
 });
 
