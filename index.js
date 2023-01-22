@@ -46,6 +46,28 @@ app.get('/diagrams/:id/edit', (req, res) => {
 
 });
 
+
+app.get('/diagrams/:id/fetch', (req, res) => {
+
+  var data = {}
+  var options = {}
+
+  db.all("SELECT id, name, data FROM diagrams WHERE id = ?", [req.params.id], function (err, rows) {
+
+      if (err) {
+        res.status(500);
+        res.send(err.message);
+      }
+      else {
+        console.log[rows[0]];
+        res.status(200);
+        res.send(rows[0]);
+      }
+
+  });
+
+});
+
 app.post('/diagrams/new', (req, res) => {
 
   //console.log(req);
@@ -80,6 +102,29 @@ app.post('/diagrams/:id/update', (req, res) => {
   } else {
 
     db.get("UPDATE diagrams SET name = name, data = ? WHERE id = ?", [req.body.data, req.params.id], function(err, row) {
+      
+      if (err) {
+        res.status(500);
+        res.send(err.message);
+      }
+      else {
+        res.status(200);
+        res.send({ status: "OK" });
+      }
+
+    });
+  }
+  
+});
+
+app.post('/diagrams/:id/rename', (req, res) => {
+
+  if (req.params.id == '') {
+    res.status(500);
+    res.send('Missing id');
+  } else {
+
+    db.get("UPDATE diagrams SET name = ? WHERE id = ?", [req.body.name, req.params.id], function(err, row) {
       
       if (err) {
         res.status(500);

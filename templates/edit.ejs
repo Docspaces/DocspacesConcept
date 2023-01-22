@@ -97,6 +97,13 @@
         background-color: #BFBFBF; 
     }
 
+    a#lnkChangeName, a#lnkChangeName:visited {
+        font-size: 10px;
+        text-decoration: none;
+        display:inline-block;
+        color: #5b6570;
+    }
+
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.min.css" integrity="sha512-GzcoZD7y5zvBofYtImXPZaPVhoY7xLPt+ysmbPb/vU+quSKFkcngxaSrxuwprDZL4MALUqGFmnqCxQZqMozv1Q==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -133,7 +140,7 @@
         </div>
         <div class="split-panel-container-resizer" id="split_view_resize_handle"></div>
         <div class="split-panel-container-right" style="overflow: scroll;">
-            <h1 style="position:relative; margin:0 0 20px 0; font-family:sans-serif; font-size:20px; padding-bottom:15px; border-bottom:solid 1px #E4E4E4;"><%= diagram.name %></h1>
+            <h1 style="position:relative; margin:0 0 20px 0; font-family:sans-serif; font-size:20px; padding-bottom:15px; border-bottom:solid 1px #E4E4E4;"><span id="lblName"><%= diagram.name %></span> <a href="#" id="lnkChangeName">rename</a></a></h1>
             <div id="diagram_area" style="margin-top:0px;"></div>
             <button style="position:absolute; top:30px; right:50px; padding:5px 18px;" id="btnZoom">Zoom</button>
         </div>
@@ -258,6 +265,24 @@ document.addEventListener('DOMContentLoaded', function() {
         
     });
 
+    document.getElementById('lnkChangeName').addEventListener('click', async function() {
+       
+       let lblName = document.getElementById('lblName');
+
+       let newName = prompt('New name', lblName.innerText);
+
+       await postData('/diagrams/<%= diagram.id %>/rename', { name: newName }).then(function(data) { 
+           if (data['status'] == 'OK') {
+            lblName.innerText = newName;
+           }
+           else {
+            alert('Error?');
+           }
+
+       });
+       
+   });
+
     document.getElementById('btnClose').addEventListener('click', async function() {
        
        if (confirm("Save before closing?")) {
@@ -313,6 +338,24 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify(data) // body data type must match "Content-Type" header
         });
         
+        return response.json(); // parses JSON response into native JavaScript objects
+    }
+
+    async function getData(url = '', data = {}) {
+
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            //headers: {
+            //'Content-Type': 'application/json' // 'application/x-www-form-urlencoded',
+            //},
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            //body: JSON.stringify(data) // body data type must match "Content-Type" header
+        });
+
         return response.json(); // parses JSON response into native JavaScript objects
     }
 
@@ -478,7 +521,8 @@ monaco.languages.registerCompletionItemProvider('mermaid', {
 
 
     var editor = monaco.editor.create(document.getElementById('txtDiagramData'), {
-					value: `<%- diagram.data %>`,
+					//value: ` diagram.data `,
+                    value: 'Loading...',
                     automaticLayout: true,
                     scrollBeyondLastLine: false,
                     language: 'mermaid',
@@ -492,7 +536,15 @@ monaco.languages.registerCompletionItemProvider('mermaid', {
                     // lineDecorationsWidth: 0,
 				});
     
-    tryRender(); // Render the initial data on page load
+
+    getData('/diagrams/<%= diagram.id %>/fetch').then(function(data) { 
+                //alert(data.data);
+
+                editor.setValue(data.data);
+
+                tryRender(); // Render the initial data on page load
+
+    });
 
 
 });
