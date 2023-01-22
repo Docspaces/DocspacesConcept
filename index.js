@@ -43,7 +43,7 @@ app.get('/diagrams/:id/edit', (req, res) => {
       }
     });
   });
-  
+
 });
 
 app.post('/diagrams/new', (req, res) => {
@@ -56,7 +56,7 @@ app.post('/diagrams/new', (req, res) => {
     res.send('Missing name');
   } else {
 
-    db.get("INSERT INTO diagrams (name, data) VALUES (?, '') RETURNING id", [req.body.name], function(err, row) {
+    db.get("INSERT INTO diagrams (name, data) VALUES (?, 'sequenceDiagram') RETURNING id", [req.body.name], function(err, row) {
       
       if (err) {
         res.status(500);

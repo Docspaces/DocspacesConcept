@@ -14,6 +14,7 @@
         min-height: 100%;
         height: 100%;
         display: flex;
+        flex-direction: column;
         box-sizing: border-box;
     }
 
@@ -114,19 +115,20 @@
 
 </head>
 <body>
-<div class="wrapper">
+<div class="wrapper" style="flex-wrap: no-wrap; flex-direction: columns;">
+
     <div class="split-panel-container">
+        
+
         <div class="split-panel-container-left">
             <div style="display:flex; flex-direction:column; height:100%; padding:0; margin:0; box-sizing: border-box;">
-                <!--<textarea style="height:100%; width:100%; flex-grow: 1; box-sizing: border-box;" id="txtDiagramData"><%= diagram.data %></textarea>
-                -->
-                <div style="height:100%; width:100%; flex-grow: 1; box-sizing: border-box; display:flexbox; background-color: yellow;" id="txtDiagramData"></div>
+                <div style="height:100%; width:100%; flex-grow: 1; box-sizing: border-box; display:flexbox;" id="txtDiagramData"></div>
 
                 <div style="display:flex; flex-direction:row; height:50px; padding:0; margin:0; box-sizing: border-box; margin-top:10px;">
-                    <button style="height:50px; width:50%; flex-grow: 1; box-sizing: border-box; margin-right: 5px;" id="btnSave">Save</button>
-                    <button style="height:50px; width:50%; flex-grow: 1; box-sizing: border-box; margin-left: 5px;" id="btnUpdate">Render</button>
+                    <button style="height:50px; width:33%; flex-grow: 1; box-sizing: border-box; margin-right: 5px;" id="btnClose">Close</button>
+                    <button style="height:50px; width:33%; flex-grow: 1; box-sizing: border-box; margin-right: 5px;" id="btnSave">Save</button>
+                    <button style="height:50px; width:33%; flex-grow: 1; box-sizing: border-box; margin-left: 0px;" id="btnUpdate">Render</button>
                 </div>
-
             </div>
         </div>
         <div class="split-panel-container-resizer" id="split_view_resize_handle"></div>
@@ -135,6 +137,7 @@
             <div id="diagram_area" style="margin-top:0px;"></div>
             <button style="position:absolute; top:30px; right:50px; padding:5px 18px;" id="btnZoom">Zoom</button>
         </div>
+
     </div>
 </div>
 
@@ -254,6 +257,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
     });
+
+    document.getElementById('btnClose').addEventListener('click', async function() {
+       
+       if (confirm("Save before closing?")) {
+
+            let txtDiagramData = document.getElementById('txtDiagramData');
+
+            await postData('/diagrams/<%= diagram.id %>/update', { data: editor.getValue() }).then(function(data) { 
+                alert(data['status'] == 'OK' ? 'Saved successfully' : 'Error?');
+            });
+        }
+       
+        window.location = '/';
+   });
 
     var zoomed = false;
 
@@ -431,11 +448,11 @@ monaco.editor.defineTheme('mermaid', {
 	base: 'vs',
 	inherit: false,
 	rules: [
-		{ token: 'typeKeyword', foreground: '8040DD', fontStyle: 'bold' },
-		{ token: 'transition', foreground: '000000', fontStyle: 'bold' },
-		{ token: 'keyword', foreground: '8040DD', fontStyle: 'bold' },
-		{ token: 'variable', foreground: '880000', fontStyle: 'bold' },
-		{ token: 'string', foreground: '303030', fontStyle: 'bold' }
+		{ token: 'typeKeyword', foreground: '0404F5', fontStyle: 'bold' },
+		{ token: 'transition', foreground: '5577AA', fontStyle: 'bold' },
+		{ token: 'keyword', foreground: '0404F5', fontStyle: 'bold' },
+		{ token: 'variable', foreground: '23347A', fontStyle: '' },
+		{ token: 'string', foreground: '3F6D7B', fontStyle: 'bold' }
 	],
 	colors: {
 		'editor.foreground': '#000000'
@@ -463,11 +480,16 @@ monaco.languages.registerCompletionItemProvider('mermaid', {
     var editor = monaco.editor.create(document.getElementById('txtDiagramData'), {
 					value: `<%- diagram.data %>`,
                     automaticLayout: true,
+                    scrollBeyondLastLine: false,
                     language: 'mermaid',
                     theme: 'mermaid',
                     minimap: {
                 		enabled: false
-	                }
+	                },
+                    //glyphMargin: false,
+                    folding: false,
+                    // Undocumented see https://github.com/Microsoft/vscode/issues/30795#issuecomment-410998882
+                    // lineDecorationsWidth: 0,
 				});
     
     tryRender(); // Render the initial data on page load
