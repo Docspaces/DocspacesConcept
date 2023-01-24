@@ -1,555 +1,638 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<style type="text/css">
-    html, body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-    }
-
-    .wrapper {
-        padding: 0;
-        margin: 0;
-        min-height: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        box-sizing: border-box;
-    }
-
-    .split-panel-container {
-        display: flex;
-        flex-wrap: wrap;
-        padding: 0;
-        margin: 0;
-        border: 10px solid #cbd5e0;
-        min-height: 100%;
-        height: 100%;
-        width: 100%;
-        box-sizing: border-box;
-
-        background-color: #cbd5e0;
-    }
-
-    .split-panel-container-left {
-        min-height: 100%;
-        height: 100%;
-        min-width: 150px;
-        width:35%;
-
-        padding: 0;
-        margin: 0;
-
-        align-items: center;
-        justify-content: center;
-        
-        box-sizing: border-box;
-
-        background-color: #cbd5e0;
-    }
-
-    .split-panel-container-right {
-        min-height: 100%;
-        height: 100%;
-        min-width: 150px;
-
-        flex-grow: 1;
-
-        padding: 20px;
-        margin: 0;
-
-        align-items: center;
-        justify-content: center;
-        
-        box-sizing: border-box;
-
-        background-color: white;
-        border: solid 1px #AAA;
-    }
-
-    .split-panel-container-resizer {
-        width:10px;
-        min-height:20px;
-        cursor: ew-resize;
-
-        box-sizing: border-box;
-        background-color: #cbd5e0;
-    }
-
-    button { 
-        border-top: solid 1px #EEE;
-        border-left: solid 1px #EEE;
-        border-bottom: solid 1px #999;
-        border-right: solid 1px #999;
-        background-color: #CFCFCF; 
-    }
-
-    button:hover {
-        background-color: #BFBFBF;
-    }
-
-    button:active { 
-        border-right: solid 1px #EEE;
-        border-bottom: solid 1px #EEE;
-        border-left: solid 1px #999;
-        border-top: solid 1px #999;
-        background-color: #BFBFBF; 
-    }
-
-    a#lnkChangeName, a#lnkChangeName:visited {
-        font-size: 10px;
-        text-decoration: none;
-        display:inline-block;
-        color: #5b6570;
-    }
-
-</style>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.min.css" integrity="sha512-GzcoZD7y5zvBofYtImXPZaPVhoY7xLPt+ysmbPb/vU+quSKFkcngxaSrxuwprDZL4MALUqGFmnqCxQZqMozv1Q==" crossorigin="anonymous" referrerpolicy="no-referrer">
-<script>
-    var require = {
-        paths: {
-            vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs'
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
         }
-    };
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js" integrity="sha512-6bIYsGqvLpAiEBXPdRQeFf5cueeBECtAKJjIHer3BhBZNTV3WLcLA8Tm3pDfxUwTMIS+kAZwTUvJ1IrMdX8C5w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.nls.min.js" integrity="sha512-CCv+DKWw+yZhxf4Z+ExT6HC5G+3S45TeMTYcJyYbdrv4BpK2vyALJ4FoVR/KGWDIPu7w4tNCOC9MJQIkYPR5FA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<link rel="stylesheet" type="text/css" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/editor/editor.main.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.js" integrity="sha512-BtSZPhzoyN8kq1axY6cgOFPSgLJgFwvAZ3WxeDGxEFXeFcFuK2s7Hr+zF75npVHASUY1dxudAfIVzwmgdR89Bw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<meta http-equiv="content-security-policy" content="">
+
+        .wrapper {
+            padding: 0;
+            margin: 0;
+            min-height: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .split-panel-container {
+            display: flex;
+            flex-wrap: wrap;
+            flex-grow: 1;
+            padding: 10px;
+            margin: 0;
+            xborder: 6px solid #cbd5e0;
+            min-height: 100%;
+            height: 100%;
+            width: 100%;
+            box-sizing: border-box;
+
+            background-color: #cbd5e0;
+        }
+
+        .split-panel-container-left {
+            min-height: 100%;
+            height: 100%;
+            min-width: 150px;
+            width: 35%;
+
+            padding: 0;
+            margin: 0;
+
+            align-items: center;
+            justify-content: center;
+
+            box-sizing: border-box;
+
+            background-color: #cbd5e0;
+        }
+
+        .split-panel-container-right {
+            min-height: 100%;
+            height: 100%;
+            min-width: 150px;
+
+            flex-grow: 1;
+
+            padding: 20px;
+            margin: 0;
+
+            align-items: center;
+            justify-content: center;
+
+            box-sizing: border-box;
+
+            background-color: white;
+            border: solid 1px #AAA;
+        }
+
+        .split-panel-container-resizer {
+            width: 8px;
+            min-height: 20px;
+            cursor: ew-resize;
+
+            box-sizing: border-box;
+            background-color: #cbd5e0;
+        }
+
+        button {
+            border-top: solid 1px #EEE;
+            border-left: solid 1px #EEE;
+            border-bottom: solid 1px #999;
+            border-right: solid 1px #999;
+            background-color: #CFCFCF;
+        }
+
+        button:hover {
+            background-color: #BFBFBF;
+        }
+
+        button:active {
+            border-right: solid 1px #EEE;
+            border-bottom: solid 1px #EEE;
+            border-left: solid 1px #999;
+            border-top: solid 1px #999;
+            background-color: #BFBFBF;
+        }
+
+        a#lnkChangeName,
+        a#lnkChangeName:visited {
+            font-size: 10px;
+            text-decoration: none;
+            display: inline-block;
+            color: #5b6570;
+        }
+
+        .page-container {
+            display: flex;
+            flex-direction: column;
+
+            height: 100%;
+            min-height: 100%;
+            width: 100%;
+        }
+
+        .top-panel {
+            display: flexbox;
+            height: 80px;
+            background-color: white;
+            box-shadow: 0px 2px 12px #999;
+            border-bottom: solid 1px #999;
+        }
+
+        .bottom-panel {
+            xbox-shadow: 0px -2px 20px #999;
+            display: flexbox;
+            flex-grow: 1;
+            height: calc(100vh - 80px);
+            min-height: calc(100vh - 80px);
+            max-height: calc(100vh - 80px);
+
+        }
+
+
+
+        .errorIcon {
+            display: block;
+            xbackground-image: url('../assets/icons/errorIcon.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-color: #FFAAAA;
+        }
+    </style>
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.min.css"
+        integrity="sha512-GzcoZD7y5zvBofYtImXPZaPVhoY7xLPt+ysmbPb/vU+quSKFkcngxaSrxuwprDZL4MALUqGFmnqCxQZqMozv1Q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+    <script>
+        var require = {
+            paths: {
+                vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs'
+            }
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"
+        integrity="sha512-6bIYsGqvLpAiEBXPdRQeFf5cueeBECtAKJjIHer3BhBZNTV3WLcLA8Tm3pDfxUwTMIS+kAZwTUvJ1IrMdX8C5w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.nls.min.js"
+        integrity="sha512-CCv+DKWw+yZhxf4Z+ExT6HC5G+3S45TeMTYcJyYbdrv4BpK2vyALJ4FoVR/KGWDIPu7w4tNCOC9MJQIkYPR5FA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" type="text/css" data-name="vs/editor/editor.main"
+        href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/editor/editor.main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.js"
+        integrity="sha512-BtSZPhzoyN8kq1axY6cgOFPSgLJgFwvAZ3WxeDGxEFXeFcFuK2s7Hr+zF75npVHASUY1dxudAfIVzwmgdR89Bw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta http-equiv="content-security-policy" content="">
 
 </head>
+
 <body>
-<div class="wrapper" style="flex-wrap: no-wrap; flex-direction: columns;">
+    <div class="wrapper">
+        <div class="top-panel" style="padding:3px 10px; margin:0;">
+            <p style="margin:5px; font-family:helvetica; color:#7e92a7;">Docspaces Concept / Mermaid Editor</p>
 
-    <div class="split-panel-container">
-        
+            <button
+                style="position:absolute; background:#eaeaea; border:solid 1px #DADADA; border-radius: 5px; top:30px; right:130px; padding:5px 18px;"
+                id="btnSave">Save</button>
+            <button
+                style="position:absolute; background:#eaeaea; border:solid 1px #DADADA; border-radius: 5px; top:30px; right:50px; padding:5px 18px;"
+                id="btnClose">Exit</button>
 
-        <div class="split-panel-container-left">
-            <div style="display:flex; flex-direction:column; height:100%; padding:0; margin:0; box-sizing: border-box;">
-                <div style="height:100%; width:100%; flex-grow: 1; box-sizing: border-box; display:flexbox;" id="txtDiagramData"></div>
+        </div>
+        <div class="bottom-panel">
 
-                <div style="display:flex; flex-direction:row; height:50px; padding:0; margin:0; box-sizing: border-box; margin-top:10px;">
-                    <button style="height:50px; width:33%; flex-grow: 1; box-sizing: border-box; margin-right: 5px;" id="btnClose">Close</button>
-                    <button style="height:50px; width:33%; flex-grow: 1; box-sizing: border-box; margin-right: 5px;" id="btnSave">Save</button>
-                    <button style="height:50px; width:33%; flex-grow: 1; box-sizing: border-box; margin-left: 0px;" id="btnUpdate">Render</button>
+            <div class="split-panel-container">
+                <div class="split-panel-container-left">
+                    <div style="width:100%; height:100%;" id="txtDiagramData"></div>
+                </div>
+                <div class="split-panel-container-resizer" id="split_view_resize_handle"></div>
+                <div class="split-panel-container-right" style="overflow: scroll;">
+                    <h1
+                        style="position:relative; margin:0 0 20px 0; font-family:sans-serif; font-size:20px; padding-bottom:15px; border-bottom:solid 1px #E4E4E4;">
+                        <span id="lblName"><%= diagram.name %></span> <a href="#" id="lnkChangeName">rename</a></a>
+                    </h1>
+                    <div id="diagram_area" style="margin-top:0px;"></div>
+                    <button
+                        style="position:absolute; background:#EAEAEA; border:solid 1px #DADADA; border-radius: 5px; top:110px; right:50px; padding:5px 18px;"
+                        id="btnZoom">Zoom</button>
                 </div>
             </div>
-        </div>
-        <div class="split-panel-container-resizer" id="split_view_resize_handle"></div>
-        <div class="split-panel-container-right" style="overflow: scroll;">
-            <h1 style="position:relative; margin:0 0 20px 0; font-family:sans-serif; font-size:20px; padding-bottom:15px; border-bottom:solid 1px #E4E4E4;"><span id="lblName"><%= diagram.name %></span> <a href="#" id="lnkChangeName">rename</a></a></h1>
-            <div id="diagram_area" style="margin-top:0px;"></div>
-            <button style="position:absolute; top:30px; right:50px; padding:5px 18px;" id="btnZoom">Zoom</button>
-        </div>
 
+        </div>
     </div>
-</div>
-
-<script type="module">
-import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.esm.min.mjs";
-mermaid.initialize({ startOnLoad: true });
-
-document.addEventListener('DOMContentLoaded', function() {
-
-    const resizer = document.getElementById('split_view_resize_handle');
-    const leftPanel = resizer.previousElementSibling;
-    const rightPanel = resizer.nextElementSibling;
-
-    let mouse_track_x = 0;
-    let mouse_track_y = 0;
-    let resizer_leftWidth = 0;
-
-    const resizer_mousedown = function(e) {
-
-        mouse_track_x = e.clientX;
-        mouse_track_y = e.clientY;
-
-        resizer_leftWidth = leftPanel.getBoundingClientRect().width;
-
-        document.addEventListener('mousemove', resizer_mousemove);
-        document.addEventListener('mouseup', resizer_mouseup);
-
-        //resizer.style.cursor = 'col-resize';
-        //document.body.style.cursor = 'col-resize';
-
-        leftPanel.style.userSelect = 'none';
-        rightPanel.style.userSelect = 'none';
-        
-        leftPanel.style.pointerEvents = 'none';
-        rightPanel.style.pointerEvents = 'none';
-    }
-
-    const resizer_mousemove = function(e) {
-
-        const dx = e.clientX - mouse_track_x;
-        const dy = e.clientY - mouse_track_y;
-        
-        const newLeftWidth = Math.min(((resizer_leftWidth + dx) * 100) / resizer.parentNode.getBoundingClientRect().width, 75.0);
-        leftPanel.style.width = `${newLeftWidth}%`;
-    }
-
-    const resizer_mouseup = function(e) {
-
-        //resizer.style.cursor = 'cursor';
-        //document.body.style.cursor = 'cursor';
-
-        leftPanel.style.userSelect = 'all';
-        rightPanel.style.userSelect = 'all';
-
-        leftPanel.style.pointerEvents = 'auto';
-        rightPanel.style.pointerEvents = 'auto';
 
 
-        //leftPanel.style.removeProperty('pointerEvents');
-        //rightPanel.style.removeProperty('pointerEvents');
+    <script type="module">
+        import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.esm.min.mjs";
+        mermaid.initialize({ startOnLoad: true, securityLevel: 'antiscript', });
 
-        document.removeEventListener('mousemove', resizer_mousemove);
-        document.removeEventListener('mouseup', resizer_mouseup);
+        document.addEventListener('DOMContentLoaded', function () {
 
-        console.log(leftPanel.style);
-        console.log('here');
-    }
+            const resizer = document.getElementById('split_view_resize_handle');
+            const leftPanel = resizer.previousElementSibling;
+            const rightPanel = resizer.nextElementSibling;
 
-    resizer.addEventListener('mousedown', resizer_mousedown);
+            let mouse_track_x = 0;
+            let mouse_track_y = 0;
+            let resizer_leftWidth = 0;
 
-    function tryRender() {
+            const resizer_mousedown = function (e) {
 
-        let txtDiagramData = document.getElementById('txtDiagramData');
-        let diagram_area = document.getElementById('diagram_area');
+                mouse_track_x = e.clientX;
+                mouse_track_y = e.clientY;
 
-        let oldScrollTop = diagram_area.parentElement.scrollTop;
-        let oldScrollLeft = diagram_area.parentElement.scrollLeft;
+                resizer_leftWidth = leftPanel.getBoundingClientRect().width;
 
-        //debugger;
+                document.addEventListener('mousemove', resizer_mousemove);
+                document.addEventListener('mouseup', resizer_mouseup);
 
-        try {
-            mermaid.render('x', editor.getValue(), function(svg) {
+                //resizer.style.cursor = 'col-resize';
+                //document.body.style.cursor = 'col-resize';
 
-                if (!svg.startsWith('<svg aria-roledescription="error"')) {
+                leftPanel.style.userSelect = 'none';
+                rightPanel.style.userSelect = 'none';
 
-                    diagram_area.innerHTML = svg;
+                leftPanel.style.pointerEvents = 'none';
+                rightPanel.style.pointerEvents = 'none';
+            }
 
-                    if (zoomed) {
-                        let viewAreaWidth = diagram_area.getBoundingClientRect().width;
-                        let diagramWidth = diagram_area.firstChild.viewBox.baseVal.width;
-                        let fullZoom = Math.max(diagramWidth/viewAreaWidth, 1)*100;
-                        
-                        diagram_area.firstChild.style.width=`${fullZoom}%`;
-                        
-                        diagram_area.parentElement.scrollTop = oldScrollTop;
-                        diagram_area.parentElement.scrollLeft = oldScrollLeft;
+            const resizer_mousemove = function (e) {
+
+                const dx = e.clientX - mouse_track_x;
+                const dy = e.clientY - mouse_track_y;
+
+                const newLeftWidth = Math.min(((resizer_leftWidth + dx) * 100) / resizer.parentNode.getBoundingClientRect().width, 75.0);
+                leftPanel.style.width = `${newLeftWidth}%`;
+            }
+
+            const resizer_mouseup = function (e) {
+
+                //resizer.style.cursor = 'cursor';
+                //document.body.style.cursor = 'cursor';
+
+                leftPanel.style.userSelect = 'all';
+                rightPanel.style.userSelect = 'all';
+
+                leftPanel.style.pointerEvents = 'auto';
+                rightPanel.style.pointerEvents = 'auto';
+
+                //leftPanel.style.removeProperty('pointerEvents');
+                //rightPanel.style.removeProperty('pointerEvents');
+
+                document.removeEventListener('mousemove', resizer_mousemove);
+                document.removeEventListener('mouseup', resizer_mouseup);
+
+                console.log(leftPanel.style);
+                console.log('here');
+            }
+
+            resizer.addEventListener('mousedown', resizer_mousedown);
+
+            var d = [];
+
+            mermaid.parseError = function (err, hash) {
+
+                // Still got some weirdness with line numbers
+
+                d = editor.deltaDecorations(d, [{
+                    range: new monaco.Range(err.hash.line, 1, err.hash.line, 1),
+                    options: {
+                        glyphMarginClassName: 'errorIcon',
+                        isWholeLine: true,
+                        className: 'errorIcon'
+                    }
+                }]);
+
+            };
+
+            function tryRender() {
+
+                let txtDiagramData = document.getElementById('txtDiagramData');
+                let diagram_area = document.getElementById('diagram_area');
+
+                let oldScrollTop = diagram_area.parentElement.scrollTop;
+                let oldScrollLeft = diagram_area.parentElement.scrollLeft;
+
+                //debugger;
+
+                try {
+                    if (mermaid.parse(editor.getValue())) {
+
+                        d = editor.deltaDecorations(d, []);
+
+                        mermaid.render('x', editor.getValue(), function (svg) {
+
+                            if (!svg.startsWith('<svg aria-roledescription="error"')) {
+
+                                diagram_area.innerHTML = svg;
+
+                                if (zoomed) {
+                                    let viewAreaWidth = diagram_area.getBoundingClientRect().width;
+                                    let diagramWidth = diagram_area.firstChild.viewBox.baseVal.width;
+                                    let fullZoom = Math.max(diagramWidth / viewAreaWidth, 1) * 100;
+
+                                    diagram_area.firstChild.style.width = `${fullZoom}%`;
+
+                                    diagram_area.parentElement.scrollTop = oldScrollTop;
+                                    diagram_area.parentElement.scrollLeft = oldScrollLeft;
+                                }
+                            }
+                        });
                     }
                 }
+                catch (e) {
+                    alert(e);
+                }
+            }
+
+            document.getElementById('btnSave').addEventListener('click', async function () {
+
+                let txtDiagramData = document.getElementById('txtDiagramData');
+
+                await postData('/diagrams/<%= diagram.id %>/update', { data: editor.getValue() }).then(function (data) {
+                    alert(data['status'] == 'OK' ? 'Saved successfully' : 'Error?');
+                });
+
             });
-        }
-        catch(e)
-        {
-            alert(e);
-        }
-    }
 
-    document.getElementById('btnUpdate').addEventListener('click', function() {
-        tryRender();
-    });
+            document.getElementById('lnkChangeName').addEventListener('click', async function () {
 
-    document.getElementById('btnSave').addEventListener('click', async function() {
-       
-        let txtDiagramData = document.getElementById('txtDiagramData');
+                let lblName = document.getElementById('lblName');
 
-        await postData('/diagrams/<%= diagram.id %>/update', { data: editor.getValue() }).then(function(data) { 
-            alert(data['status'] == 'OK' ? 'Saved successfully' : 'Error?');
-        });
-        
-    });
+                let newName = prompt('New name', lblName.innerText);
 
-    document.getElementById('lnkChangeName').addEventListener('click', async function() {
-       
-       let lblName = document.getElementById('lblName');
+                await postData('/diagrams/<%= diagram.id %>/rename', { name: newName }).then(function (data) {
+                    if (data['status'] == 'OK') {
+                        lblName.innerText = newName;
+                    }
+                    else {
+                        alert('Error?');
+                    }
 
-       let newName = prompt('New name', lblName.innerText);
+                });
 
-       await postData('/diagrams/<%= diagram.id %>/rename', { name: newName }).then(function(data) { 
-           if (data['status'] == 'OK') {
-            lblName.innerText = newName;
-           }
-           else {
-            alert('Error?');
-           }
-
-       });
-       
-   });
-
-    document.getElementById('btnClose').addEventListener('click', async function() {
-       
-       if (confirm("Save before closing?")) {
-
-            let txtDiagramData = document.getElementById('txtDiagramData');
-
-            await postData('/diagrams/<%= diagram.id %>/update', { data: editor.getValue() }).then(function(data) { 
-                alert(data['status'] == 'OK' ? 'Saved successfully' : 'Error?');
             });
-        }
-       
-        window.location = '/';
-   });
 
-    var zoomed = false;
+            document.getElementById('btnClose').addEventListener('click', async function () {
+/*
+                if (confirm("Save before closing?")) { // This isn't great
 
-    document.getElementById('btnZoom').addEventListener('click', function() {
-       
-        let diagram_area = document.getElementById('diagram_area');
+                    let txtDiagramData = document.getElementById('txtDiagramData');
 
-        //document.getElementById('diagram_area').firstChild.setAttribute("viewBox", "0 0 1995 2601"); 
-        //document.getElementById('diagram_area').firstChild.style.width="200%";
-        //document.getElementById('diagram_area').firstChild.viewBox.baseVal.width // 1995
-        //document.getElementById('diagram_area').getBoundingClientRect().width // 1077.671875
-
-        if (zoomed) {
-            diagram_area.firstChild.style.width=`100%`;
-        }
-        else {
-            let viewAreaWidth = diagram_area.getBoundingClientRect().width;
-            let diagramWidth = diagram_area.firstChild.viewBox.baseVal.width;
-            let fullZoom = Math.max(diagramWidth/viewAreaWidth, 1)*100;
-           
-            diagram_area.firstChild.style.width=`${fullZoom}%`;
-        }
-
-        zoomed = !zoomed;
-
-    });
-
-    async function postData(url = '', data = {}) {
-
-        const response = await fetch(url, {
-            method: 'POST',
-            mode: 'cors', // no-cors, *cors, same-origin
-            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-            credentials: 'same-origin', // include, *same-origin, omit
-            headers: {
-              'Content-Type': 'application/json' // 'application/x-www-form-urlencoded',
-            },
-            redirect: 'follow', // manual, *follow, error
-            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-            body: JSON.stringify(data) // body data type must match "Content-Type" header
-        });
-        
-        return response.json(); // parses JSON response into native JavaScript objects
-    }
-
-    async function getData(url = '', data = {}) {
-
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'cors', // no-cors, *cors, same-origin
-            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-            credentials: 'same-origin', // include, *same-origin, omit
-            //headers: {
-            //'Content-Type': 'application/json' // 'application/x-www-form-urlencoded',
-            //},
-            redirect: 'follow', // manual, *follow, error
-            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-            //body: JSON.stringify(data) // body data type must match "Content-Type" header
-        });
-
-        return response.json(); // parses JSON response into native JavaScript objects
-    }
+                    await postData('/diagrams/<%= diagram.id %>/update', { data: editor.getValue() }).then(function (data) {
+                        alert(data['status'] == 'OK' ? 'Saved successfully' : 'Error?');
+                    });
+                }
+*/
+                window.location = '/';
+            });
 
 
-// Register a new language
-monaco.languages.register({ id: 'mermaid' });
+            var zoomed = false;
 
-// Register a tokens provider for the language
-monaco.languages.setMonarchTokensProvider('mermaid', {
+            document.getElementById('btnZoom').addEventListener('click', function () {
 
-    keywords: {
-        sequenceDiagram: {
-            typeKeywords: ['sequenceDiagram'],
-            blockKeywords: [
-                'alt',
-                'par',
-                'and',
-                'loop',
-                'else',
-                'end',
-                'rect',
-                'opt',
-                'alt',
-                'rect',
-            ],
-            keywords: [
-                'participant',
-                'as',
-                'Note',
-                'note',
-                'right of',
-                'left of',
-                'over',
-                'activate',
-                'deactivate',
-                'autonumber',
-                'title',
-                'actor',
-                'accDescription',
-                'link',
-                'links',
-            ]
-        }
-    },
+                let diagram_area = document.getElementById('diagram_area');
 
-    sequenceDiagramBlockKeywords: ['alt',
-                'par',
-                'and',
-                'loop',
-                'else',
-                'end',
-                'rect',
-                'opt',
-                'alt',
-                'rect'],
-sequenceDiagramKeywords: ['participant',
-                'as',
-                'Note',
-                'note',
-                'right of',
-                'left of',
-                'over',
-                'activate',
-                'deactivate',
-                'autonumber',
-                'title',
-                'actor',
-                'accDescription',
-                'link',
-                'links'],
+                //document.getElementById('diagram_area').firstChild.setAttribute("viewBox", "0 0 1995 2601"); 
+                //document.getElementById('diagram_area').firstChild.style.width="200%";
+                //document.getElementById('diagram_area').firstChild.viewBox.baseVal.width // 1995
+                //document.getElementById('diagram_area').getBoundingClientRect().width // 1077.671875
 
-	tokenizer: {
-		root: [
-			[/^\s*sequenceDiagram/, 'typeKeyword', 'sequenceDiagram'],
-		],
-            sequenceDiagram: [
-                [/(title:?|accDescription)([^\r\n;]*$)/, ['keyword', 'string']],
-                [/(autonumber)([^\r\n\S]+off[^\r\n\S]*$)/, ['keyword', 'keyword']],
-                [
-                    /(autonumber)([^\r\n\S]+\d+[^\r\n\S]+\d+[^\r\n\S]*$)/,
-                    ['keyword', 'number'],
-                ],
-                [/(autonumber)([^\r\n\S]+\d+[^\r\n\S]*$)/, ['keyword', 'number']],
-                [
-                    /(link\s+)(.*?)(:)(\s*.*?)(\s*@)(\s*[^\r\n;]+)/,
-                    [
-                        'keyword',
-                        'variable',
-                        'delimiter.bracket',
-                        'string',
-                        'delimiter.bracket',
-                        'string',
-                    ],
-                ],
-                [
-                    /((?:links|properties)\s+)([^\r\n:]*?)(:\s+)/,
-                    [
-                        { token: 'keyword' },
-                        { token: 'variable' },
-                        {
-                            token: 'delimiter.bracket',
-                            nextEmbedded: 'javascript',
-                            next: '@sequenceDiagramLinksProps'
-                        },
-                    ],
-                ],
-                [
-                    /[a-zA-Z][\w$]*/,
-                    {
-                        cases: {
-                            '@sequenceDiagramBlockKeywords': 'typeKeyword',
-                            '@sequenceDiagramKeywords': 'keyword',
-                            '@default': 'variable'
-                        }
+                if (zoomed) {
+                    diagram_area.firstChild.style.width = `100%`;
+                }
+                else {
+                    let viewAreaWidth = diagram_area.getBoundingClientRect().width;
+                    let diagramWidth = diagram_area.firstChild.viewBox.baseVal.width;
+                    let fullZoom = Math.max(diagramWidth / viewAreaWidth, 1) * 100;
+
+                    diagram_area.firstChild.style.width = `${fullZoom}%`;
+                }
+
+                zoomed = !zoomed;
+
+            });
+
+            async function postData(url = '', data = {}) {
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    mode: 'cors', // no-cors, *cors, same-origin
+                    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                    credentials: 'same-origin', // include, *same-origin, omit
+                    headers: {
+                        'Content-Type': 'application/json' // 'application/x-www-form-urlencoded',
                     },
+                    redirect: 'follow', // manual, *follow, error
+                    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                    body: JSON.stringify(data) // body data type must match "Content-Type" header
+                });
+
+                return response.json(); // parses JSON response into native JavaScript objects
+            }
+
+            async function getData(url = '', data = {}) {
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    mode: 'cors', // no-cors, *cors, same-origin
+                    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                    credentials: 'same-origin', // include, *same-origin, omit
+                    //headers: {
+                    //'Content-Type': 'application/json' // 'application/x-www-form-urlencoded',
+                    //},
+                    redirect: 'follow', // manual, *follow, error
+                    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                    //body: JSON.stringify(data) // body data type must match "Content-Type" header
+                });
+
+                return response.json(); // parses JSON response into native JavaScript objects
+            }
+
+
+            // Register a new language
+            monaco.languages.register({ id: 'mermaid' });
+
+            // Register a tokens provider for the language
+            monaco.languages.setMonarchTokensProvider('mermaid', {
+
+                keywords: {
+                    sequenceDiagram: {
+                        typeKeywords: ['sequenceDiagram'],
+                        blockKeywords: [
+                            'alt',
+                            'par',
+                            'and',
+                            'loop',
+                            'else',
+                            'end',
+                            'rect',
+                            'opt',
+                            'alt',
+                            'rect',
+                        ],
+                        keywords: [
+                            'participant',
+                            'as',
+                            'Note',
+                            'note',
+                            'right of',
+                            'left of',
+                            'over',
+                            'activate',
+                            'deactivate',
+                            'autonumber',
+                            'title',
+                            'actor',
+                            'accDescription',
+                            'link',
+                            'links',
+                        ]
+                    }
+                },
+
+                sequenceDiagramBlockKeywords: ['alt',
+                    'par',
+                    'and',
+                    'loop',
+                    'else',
+                    'end',
+                    'rect',
+                    'opt',
+                    'alt',
+                    'rect'],
+                sequenceDiagramKeywords: ['participant',
+                    'as',
+                    'Note',
+                    'note',
+                    'right of',
+                    'left of',
+                    'over',
+                    'activate',
+                    'deactivate',
+                    'autonumber',
+                    'title',
+                    'actor',
+                    'accDescription',
+                    'link',
+                    'links'],
+
+                tokenizer: {
+                    root: [
+                        [/^\s*sequenceDiagram/, 'typeKeyword', 'sequenceDiagram'],
+                    ],
+                    sequenceDiagram: [
+                        [/(title:?|accDescription)([^\r\n;]*$)/, ['keyword', 'string']],
+                        [/(autonumber)([^\r\n\S]+off[^\r\n\S]*$)/, ['keyword', 'keyword']],
+                        [
+                            /(autonumber)([^\r\n\S]+\d+[^\r\n\S]+\d+[^\r\n\S]*$)/,
+                            ['keyword', 'number'],
+                        ],
+                        [/(autonumber)([^\r\n\S]+\d+[^\r\n\S]*$)/, ['keyword', 'number']],
+                        [
+                            /(link\s+)(.*?)(:)(\s*.*?)(\s*@)(\s*[^\r\n;]+)/,
+                            [
+                                'keyword',
+                                'variable',
+                                'delimiter.bracket',
+                                'string',
+                                'delimiter.bracket',
+                                'string',
+                            ],
+                        ],
+                        [
+                            /((?:links|properties)\s+)([^\r\n:]*?)(:\s+)/,
+                            [
+                                { token: 'keyword' },
+                                { token: 'variable' },
+                                {
+                                    token: 'delimiter.bracket',
+                                    nextEmbedded: 'javascript',
+                                    next: '@sequenceDiagramLinksProps'
+                                },
+                            ],
+                        ],
+                        [
+                            /[a-zA-Z][\w$]*/,
+                            {
+                                cases: {
+                                    '@sequenceDiagramBlockKeywords': 'typeKeyword',
+                                    '@sequenceDiagramKeywords': 'keyword',
+                                    '@default': 'variable'
+                                }
+                            },
+                        ],
+                        [/(--?>?>|--?[)x])[+-]?/, 'transition'],
+                        [/(:)([^:\n]*?$)/, ['delimiter.bracket', 'string']],
+                        [/%%[^$]([^%]*(?!%%$)%?)*$/, 'comment'],
+                    ],
+                    sequenceDiagramLinksProps: [
+                        // [/^:/, { token: 'delimiter.bracket', nextEmbedded: 'json' }],
+                        [
+                            /$|;/,
+                            { nextEmbedded: '@pop', next: '@pop', token: 'delimiter.bracket' },
+                        ],
+                    ]
+                }
+            });
+
+            // Define a new theme that contains only rules that match this language
+            monaco.editor.defineTheme('mermaid', {
+                base: 'vs',
+                inherit: false,
+                rules: [
+                    { token: 'typeKeyword', foreground: '0404F5', fontStyle: 'bold' },
+                    { token: 'transition', foreground: '5577AA', fontStyle: 'bold' },
+                    { token: 'keyword', foreground: '0404F5', fontStyle: 'bold' },
+                    { token: 'variable', foreground: '23347A', fontStyle: '' },
+                    { token: 'string', foreground: '3F6D7B', fontStyle: 'bold' }
                 ],
-                [/(--?>?>|--?[)x])[+-]?/, 'transition'],
-                [/(:)([^:\n]*?$)/, ['delimiter.bracket', 'string']],
-                [/%%[^$]([^%]*(?!%%$)%?)*$/, 'comment'],
-            ],
-            sequenceDiagramLinksProps: [
-                // [/^:/, { token: 'delimiter.bracket', nextEmbedded: 'json' }],
-                [
-                    /$|;/,
-                    { nextEmbedded: '@pop', next: '@pop', token: 'delimiter.bracket' },
-                ],
-            ]
-	}
-});
+                colors: {
+                    'editor.foreground': '#000000'
+                }
+            });
 
-// Define a new theme that contains only rules that match this language
-monaco.editor.defineTheme('mermaid', {
-	base: 'vs',
-	inherit: false,
-	rules: [
-		{ token: 'typeKeyword', foreground: '0404F5', fontStyle: 'bold' },
-		{ token: 'transition', foreground: '5577AA', fontStyle: 'bold' },
-		{ token: 'keyword', foreground: '0404F5', fontStyle: 'bold' },
-		{ token: 'variable', foreground: '23347A', fontStyle: '' },
-		{ token: 'string', foreground: '3F6D7B', fontStyle: 'bold' }
-	],
-	colors: {
-		'editor.foreground': '#000000'
-	}
-});
-
-// Register a completion item provider for the new language
-monaco.languages.registerCompletionItemProvider('mermaid', {
-	provideCompletionItems: () => {
-		var suggestions = [
-			{
-				label: 'sequenceDiagram',
-				kind: monaco.languages.CompletionItemKind.Keyword,
-				insertText: 'sequenceDiagram'
-			}
-		];
-		return { suggestions: suggestions };
-	}
-});
+            // Register a completion item provider for the new language
+            monaco.languages.registerCompletionItemProvider('mermaid', {
+                provideCompletionItems: () => {
+                    var suggestions = [
+                        {
+                            label: 'sequenceDiagram',
+                            kind: monaco.languages.CompletionItemKind.Keyword,
+                            insertText: 'sequenceDiagram'
+                        }
+                    ];
+                    return { suggestions: suggestions };
+                }
+            });
 
 
 
 
 
-    var editor = monaco.editor.create(document.getElementById('txtDiagramData'), {
-					//value: ` diagram.data `,
-                    value: 'Loading...',
-                    automaticLayout: true,
-                    scrollBeyondLastLine: false,
-                    language: 'mermaid',
-                    theme: 'mermaid',
-                    minimap: {
-                		enabled: false
-	                },
-                    //glyphMargin: false,
-                    folding: false,
-                    // Undocumented see https://github.com/Microsoft/vscode/issues/30795#issuecomment-410998882
-                    // lineDecorationsWidth: 0,
-				});
-    
+            var editor = monaco.editor.create(document.getElementById('txtDiagramData'), {
+                //value: ` diagram.data `,
+                value: 'Loading...',
+                automaticLayout: true,
+                scrollBeyondLastLine: false,
+                language: 'mermaid',
+                theme: 'mermaid',
+                minimap: {
+                    enabled: false
+                },
+                //glyphMargin: false,
+                folding: false,
+                // Undocumented see https://github.com/Microsoft/vscode/issues/30795#issuecomment-410998882
+                // lineDecorationsWidth: 0,
+            });
 
-    getData('/diagrams/<%= diagram.id %>/fetch').then(function(data) { 
+            editor.onDidChangeModelContent(function (e) {
+                tryRender();
+            });
+
+
+            getData('/diagrams/<%= diagram.id %> /fetch').then(function (data) {
                 //alert(data.data);
 
                 editor.setValue(data.data);
 
                 tryRender(); // Render the initial data on page load
 
-    });
+            });
 
 
-});
+        });
 
-</script>
+    </script>
 
 </body>
+
 </html>
