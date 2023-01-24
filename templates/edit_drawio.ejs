@@ -1,0 +1,131 @@
+<html>
+
+<head>
+    <style>
+        iframe,
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+</body>
+
+</html>
+<script>
+
+
+    async function postData(url = '', data = {}) {
+
+        const response = await fetch(url, {
+            method: 'POST',
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+                'Content-Type': 'application/json' // 'application/x-www-form-urlencoded',
+            },
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            body: JSON.stringify(data) // body data type must match "Content-Type" header
+        });
+
+        return response.json(); // parses JSON response into native JavaScript objects
+    }
+
+    async function getData(url = '', data = {}) {
+
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        });
+
+        return response.json(); // parses JSON response into native JavaScript objects
+    }
+
+    var url = 'https://embed.diagrams.net/?embed=1&ui=atlas&spin=1&modified=unsavedChanges&proto=json&configure=1';
+
+    var iframe = document.createElement('iframe');
+    iframe.setAttribute('frameborder', '0');
+
+    var close = function () {
+        window.removeEventListener('message', receive);
+        document.body.removeChild(iframe);
+    };
+
+    var receive = function (evt) {
+
+        if (evt.data.length > 0) {
+
+            var msg = JSON.parse(evt.data);
+
+            if (msg.event == 'configure') {
+                iframe.contentWindow.postMessage(JSON.stringify(
+                    { action: 'configure', config: {} }), '*');
+            }
+            else if (msg.event == 'init') {
+
+                getData('/diagrams/<%= diagram.id %>/fetch').then(function (data) {
+
+                    if (data.data == '') {
+
+                        let blankXml = `<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2023-01-24T21:36:12.075Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.2 Safari/605.1.15" etag="4AX-0kZhWHMES_kWqlIm" version="20.8.11">
+  <diagram name="Page-1" id="rJH5jnkXHrgRCnavIiqg">
+    <mxGraphModel dx="1026" dy="632" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>`;
+
+                        //iframe.contentWindow.postMessage(JSON.stringify(
+                        //    { action: 'load', xml:blankXml }), '*');
+
+                        iframe.contentWindow.postMessage(JSON.stringify(
+                            { action: 'template' }), '*');
+                    }
+                    else {
+                        iframe.contentWindow.postMessage(JSON.stringify(
+                            { action: 'load', xmlpng: data.data }), '*');
+                    }
+                });
+            }
+            else if (msg.event == 'save') {
+                iframe.contentWindow.postMessage(JSON.stringify(
+                    { action: 'export', format: 'xmlpng', spinKey: 'saving' }), '*');
+            }
+            else if (msg.event == 'export') {
+
+                //alert(msg.xml);
+
+                postData('/diagrams/<%= diagram.id %>/update', { data: msg.data }).then(function (data) {
+                    alert(data['status'] == 'OK' ? 'Saved successfully' : 'Error?');
+                });
+            }
+
+            if (msg.event == 'exit') { // || msg.event == 'export') {
+
+                window.removeEventListener('message', receive);
+
+                window.location = '/';
+            }
+        }
+    };
+
+    window.addEventListener('message', receive);
+    iframe.setAttribute('src', url);
+    document.body.appendChild(iframe);
+
+</script>

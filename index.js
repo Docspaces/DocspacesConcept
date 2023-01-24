@@ -7,13 +7,11 @@ const { application } = require('express');
 
 const db = new sqlite3.Database('./test.db');
 
-db.run('CREATE TABLE IF NOT EXISTS diagrams (id integer primary key autoincrement, name text not null, data text not null)');
+db.run('CREATE TABLE IF NOT EXISTS diagrams (id integer primary key autoincrement, name text not null, data text not null, type varchar(50) not null)');
 
 const app = express();
 
-//app.use(express.json());
-//app.use(express.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 //app.use(cors);
 
@@ -22,7 +20,7 @@ app.get('/diagrams/:id/edit', (req, res) => {
   var data = {}
   var options = {}
 
-  db.all("SELECT id, name, data FROM diagrams WHERE id = ?", [req.params.id], function (err, rows) {
+  db.all("SELECT id, name, data, type FROM diagrams WHERE id = ?", [req.params.id], function (err, rows) {
 
     if (err) {
       console.error(err.message);
@@ -31,7 +29,9 @@ app.get('/diagrams/:id/edit', (req, res) => {
 
     data.diagram = rows[0];
 
-    ejs.renderFile('./templates/edit.ejs', data, options, function (err, str) {
+    var template = data.diagram.type == 'drawio' ? './templates/edit_drawio.ejs' : './templates/edit_mermaid.ejs';
+
+    ejs.renderFile(template, data, options, function (err, str) {
 
       if (err) {
         res.status(500);
@@ -52,17 +52,17 @@ app.get('/diagrams/:id/fetch', (req, res) => {
   var data = {}
   var options = {}
 
-  db.all("SELECT id, name, data FROM diagrams WHERE id = ?", [req.params.id], function (err, rows) {
+  db.all("SELECT id, name, data, type FROM diagrams WHERE id = ?", [req.params.id], function (err, rows) {
 
-      if (err) {
-        res.status(500);
-        res.send(err.message);
-      }
-      else {
-        console.log[rows[0]];
-        res.status(200);
-        res.send(rows[0]);
-      }
+    if (err) {
+      res.status(500);
+      res.send(err.message);
+    }
+    else {
+      console.log[rows[0]];
+      res.status(200);
+      res.send(rows[0]);
+    }
 
   });
 
@@ -72,14 +72,21 @@ app.post('/diagrams/new', (req, res) => {
 
   //console.log(req);
   console.log(req.body.name);
+  console.log(req.body.diagramType);
 
   if (req.params.name == '') {
     res.status(500);
     res.send('Missing name');
   } else {
 
-    db.get("INSERT INTO diagrams (name, data) VALUES (?, 'sequenceDiagram') RETURNING id", [req.body.name], function(err, row) {
-      
+    var defaultData = '';
+
+    if (req.body.diagramType == 'mermaid') {
+      defaultData = `sequenceDiagram`
+    }
+
+    db.get("INSERT INTO diagrams (name, type, data) VALUES (?, ?, ?) RETURNING id", [req.body.name, req.body.diagramType, defaultData], function (err, row) {
+
       if (err) {
         res.status(500);
         res.send(err.message);
@@ -101,8 +108,8 @@ app.post('/diagrams/:id/update', (req, res) => {
     res.send('Missing id');
   } else {
 
-    db.get("UPDATE diagrams SET name = name, data = ? WHERE id = ?", [req.body.data, req.params.id], function(err, row) {
-      
+    db.get("UPDATE diagrams SET data = ? WHERE id = ?", [req.body.data, req.params.id], function (err, row) {
+
       if (err) {
         res.status(500);
         res.send(err.message);
@@ -114,7 +121,7 @@ app.post('/diagrams/:id/update', (req, res) => {
 
     });
   }
-  
+
 });
 
 app.post('/diagrams/:id/rename', (req, res) => {
@@ -124,8 +131,8 @@ app.post('/diagrams/:id/rename', (req, res) => {
     res.send('Missing id');
   } else {
 
-    db.get("UPDATE diagrams SET name = ? WHERE id = ?", [req.body.name, req.params.id], function(err, row) {
-      
+    db.get("UPDATE diagrams SET name = ? WHERE id = ?", [req.body.name, req.params.id], function (err, row) {
+
       if (err) {
         res.status(500);
         res.send(err.message);
@@ -137,7 +144,7 @@ app.post('/diagrams/:id/rename', (req, res) => {
 
     });
   }
-  
+
 });
 
 app.get('/', (req, res) => {
@@ -145,7 +152,7 @@ app.get('/', (req, res) => {
   var data = {}
   var options = {}
 
-  db.all("SELECT id, name FROM diagrams ORDER BY name", function (err, rows) {
+  db.all("SELECT id, name, type FROM diagrams ORDER BY name", function (err, rows) {
 
     if (err) {
       console.error(err.message);
@@ -168,5 +175,5 @@ app.get('/', (req, res) => {
 
 });
 
-app.use('/', express.static(__dirname + '/public'));
+app.use('/', express.static(__dirname + '/static'));
 app.listen(3000, () => console.log('App Started'));

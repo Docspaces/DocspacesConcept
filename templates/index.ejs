@@ -4,10 +4,11 @@
 <body>
     <main>
         <h1>Docspaces Concept</h1>
-        <a href="#" onclick="createNewDiagram(); return false;">New Diagram</a>
+        <a href="#" onclick="createNewDiagram('mermaid'); return false;">New Mermaid Diagram</a>
+        <a href="#" onclick="createNewDiagram('drawio'); return false;">New Draw.io Diagram</a>
         <ul>
             <% for(var i=0; i < diagrams.length; i++) { %>
-                <li><a href="/diagrams/<%= diagrams[i].id %>/edit"><%= diagrams[i].name %></a></li>
+                <li><a href="/diagrams/<%= diagrams[i].id %>/edit"><%= diagrams[i].name %></a></li>    
             <% } %>
         </ul>
     </main>
@@ -31,10 +32,10 @@
             return response.json();
         }
 
-        function createNewDiagram() {
+        function createNewDiagram(diagramType) {
             var name = prompt();
 
-            postData('/diagrams/new', { name: name }).then(function (data) {
+            postData('/diagrams/new', { name: name, diagramType: diagramType }).then(function (data) {
                 window.location = `/diagrams/${data.id}/edit`;
             });
         }
