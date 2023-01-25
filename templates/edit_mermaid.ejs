@@ -328,7 +328,11 @@
                     }
                 }
                 catch (e) {
-                    alert(e);
+                    // Some errors aren't dealt with by the try-parse method, not really
+                    // sure why. They end up here, and it blanks the diagram until the error
+                    // is fixed.
+
+                    //alert(e);
                 }
             }
 
@@ -361,7 +365,15 @@
             });
 
             document.getElementById('btnClose').addEventListener('click', async function () {
-/*
+
+                if (originalData != editor.getValue()) {
+
+                    
+                }
+
+                window.location = '/';
+
+                /*
                 if (confirm("Save before closing?")) { // This isn't great
 
                     let txtDiagramData = document.getElementById('txtDiagramData');
@@ -371,7 +383,7 @@
                     });
                 }
 */
-                window.location = '/';
+
             });
 
 
@@ -619,8 +631,11 @@
             });
 
 
-            getData('/diagrams/<%= diagram.id %> /fetch').then(function (data) {
-                //alert(data.data);
+            let originalData = "";
+
+            getData('/diagrams/<%= diagram.id %>/fetch').then(function (data) {
+
+                originalData = data.data;
 
                 editor.setValue(data.data);
 

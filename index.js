@@ -8,6 +8,19 @@ const { application } = require('express');
 const db = new sqlite3.Database('./test.db');
 
 db.run('CREATE TABLE IF NOT EXISTS diagrams (id integer primary key autoincrement, name text not null, data text not null, type varchar(50) not null)');
+//db.run('DROP TABLE IF EXISTS pages');
+
+db.run('CREATE TABLE IF NOT EXISTS pages (id integer primary key autoincrement, path text not null unique, data text not null)');
+
+// Markdown rendering library
+const marked = require('marked')
+
+// Libraries to sanitise HTML
+const createDOMPurify = require('dompurify')
+const { JSDOM } = require('jsdom')
+const window = new JSDOM('').window
+const DOMPurify = createDOMPurify(window)
+
 
 const app = express();
 
@@ -147,7 +160,7 @@ app.post('/diagrams/:id/rename', (req, res) => {
 
 });
 
-app.get('/', (req, res) => {
+app.get('/diagrams', (req, res) => {
 
   var data = {}
   var options = {}
@@ -173,6 +186,73 @@ app.get('/', (req, res) => {
     });
   });
 
+});
+
+app.get(/^\/[a-zA-Z0-9\/]+$/, (req, res) => {
+  console.log('GET ' + req._parsedUrl.pathname)
+
+  // if you want to use markdown you can do this:
+  // let processed = marked.parse(mdContent) // <<-- produces an HTML string
+ 
+  // Try and read a note from our db with note_path = the url in the request
+  db.get("SELECT * FROM pages WHERE path = ?", [req._parsedUrl.pathname], function(err, row) {
+    if (err) {
+      console.error(err.message);
+      return
+    }
+
+    var pageData = '';
+
+
+    if (row) {
+      console.log('Loaded page ' + row.id + ": " + row.data)
+      pageData = row.data;
+    }
+
+    if (req.query['edit'] != undefined) {        
+      renderEditorWithContent(pageData, res)
+    }
+    else {
+      var data = {}
+      var options = {}
+
+      let processed = marked.parse(pageData); // <<-- produces an HTML string
+
+      data.output = DOMPurify.sanitize(processed);
+
+      ejs.renderFile('./templates/page_render.ejs', data, options, function(err, str) {
+        res.send(str)
+      });
+    }
+
+  })
+});
+
+  function renderEditorWithContent(content, res) {
+    var data = {}
+    var options = {}
+  
+    data.output = DOMPurify.sanitize(content)
+  
+    ejs.renderFile('./templates/page_editor.ejs', data, options, function(err, str) {
+      res.send(str)
+    });
+  }
+
+
+  // This processes the same URLs as the .get method, but this is for post-back only, so when the user is trying to update
+app.post('/*', (req, res) => {
+  console.log('POST ' + req._parsedUrl.pathname)
+  console.log(req.body);
+
+  // This is a funny Sqlite specific way to update-or-insert in a single statement, just for simplicity
+  db.run("INSERT INTO pages (path, data) \
+            VALUES(?, ?) \
+            ON CONFLICT(path) DO UPDATE SET \
+              data = ?", [req._parsedUrl.pathname, req.body.content, req.body.content]);
+
+  // Re-render the editor with the same content we just saved
+  renderEditorWithContent(req.body.content, res)
 });
 
 app.use('/', express.static(__dirname + '/static'));

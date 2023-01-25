@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.min.css"
+    integrity="sha512-GzcoZD7y5zvBofYtImXPZaPVhoY7xLPt+ysmbPb/vU+quSKFkcngxaSrxuwprDZL4MALUqGFmnqCxQZqMozv1Q=="
+    crossorigin="anonymous" referrerpolicy="no-referrer">
+<script>
+    var require = {
+        paths: {
+            vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs'
+        }
+    };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"
+    integrity="sha512-6bIYsGqvLpAiEBXPdRQeFf5cueeBECtAKJjIHer3BhBZNTV3WLcLA8Tm3pDfxUwTMIS+kAZwTUvJ1IrMdX8C5w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.nls.min.js"
+    integrity="sha512-CCv+DKWw+yZhxf4Z+ExT6HC5G+3S45TeMTYcJyYbdrv4BpK2vyALJ4FoVR/KGWDIPu7w4tNCOC9MJQIkYPR5FA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" type="text/css" data-name="vs/editor/editor.main"
+    href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/editor/editor.main.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.js"
+    integrity="sha512-BtSZPhzoyN8kq1axY6cgOFPSgLJgFwvAZ3WxeDGxEFXeFcFuK2s7Hr+zF75npVHASUY1dxudAfIVzwmgdR89Bw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<meta http-equiv="content-security-policy" content="">
+  </head>
+  <body>
+    <!-- Following hidden div contains the data that will be loaded by the text editor -->
+    <div id=content style="display:none"><%- output %></div>
+
+    <a href="/">Nodebook Homepage</a> | <a href="/notes">index</a>
+    <hr/>
+    <!-- Following div will become the text editor -->
+    <div id=editor style="height:50%;"></div>
+    <hr/>
+    <!--
+    <div style="text-align: center">
+      <label style="border-right: 1px solid silver">
+        Markdown <input type="radio" name="inputformat" value="markdown" checked="">&nbsp;</label>
+      <label>&nbsp;<input type="radio" name="inputformat" value="prosemirror"> WYSIWYM</label>
+    </div>
+    -->
+    <!-- This form posts our data back to the server. An event handler on the button (added by app.js) will put the editor content in to the hidden field before posting --> 
+    <form method=POST>
+      <input type=hidden id="save-content" name="content" />
+      <button id="save">Save</button>
+    </form>
+    <hr/>
+    <script type="module">
+        import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.esm.min.mjs";
+        mermaid.initialize({ startOnLoad: true, securityLevel: 'antiscript', });
+
+        document.getElementById('save').addEventListener('click', function () {
+            document.getElementById('save-content').value = editor.getValue();
+            //alert(document.getElementById('save-content').value);
+        });
+
+        var editor = monaco.editor.create(document.getElementById('editor'), {
+                value: document.getElementById('content').innerText,
+                automaticLayout: true,
+                scrollBeyondLastLine: false,
+                language: 'markdown',
+                minimap: {
+                    enabled: false
+                },
+                //glyphMargin: false,
+                folding: false,
+                // Undocumented see https://github.com/Microsoft/vscode/issues/30795#issuecomment-410998882
+                // lineDecorationsWidth: 0,
+            });
+
+        
+
+    </script>
+
+
+  </body>
+</html>
