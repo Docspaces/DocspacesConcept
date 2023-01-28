@@ -4,6 +4,7 @@ const cors = require('cors');
 const ejs = require('ejs');
 const bodyParser = require('body-parser');
 const { application } = require('express');
+const hljs = require('highlight.js');
 
 const db = new sqlite3.Database('./test.db');
 
@@ -15,9 +16,23 @@ db.run('CREATE TABLE IF NOT EXISTS pages (id integer primary key autoincrement, 
 // Markdown rendering library
 const marked = require('marked')
 
+marked.setOptions({
+  highlight: function(code, lang) { 
+    console.log(`lang = '${lang}'`);
+    if (lang !== '') {
+      return hljs.highlight(code, { language: lang }).value;
+    }
+    else {
+      return hljs.highlightAuto(code).value;
+    }
+  }
+});
+
 // Libraries to sanitise HTML
 const createDOMPurify = require('dompurify')
-const { JSDOM } = require('jsdom')
+const { JSDOM } = require('jsdom');
+const { redirect } = require('express/lib/response');
+const e = require('express');
 const window = new JSDOM('').window
 const DOMPurify = createDOMPurify(window)
 
@@ -188,7 +203,31 @@ app.get('/diagrams', (req, res) => {
 
 });
 
-app.get(/^\/[a-zA-Z0-9\/]+$/, (req, res) => {
+app.get('/pages/:id/fetch', (req, res) => {
+
+  var data = {}
+  var options = {}
+
+  db.all("SELECT id, path, data FROM pages WHERE id = ?", [req.params.id], function (err, rows) {
+ 
+    console.log('fetch page');
+    if (err) {
+      console.log('err');
+      res.status(500);
+      res.send(err.message);
+    }
+    else {
+      console.log(rows);
+      console.log[rows[0]];
+      res.status(200);
+      res.send(rows[0]);
+    }
+
+  });
+
+});
+
+app.get(/^\/[a-zA-Z0-9%\/\-]*$/, (req, res) => {
   console.log('GET ' + req._parsedUrl.pathname)
 
   // if you want to use markdown you can do this:
@@ -202,15 +241,31 @@ app.get(/^\/[a-zA-Z0-9\/]+$/, (req, res) => {
     }
 
     var pageData = '';
+    var pageId = 0;
 
 
     if (row) {
-      console.log('Loaded page ' + row.id + ": " + row.data)
+      console.log('Loaded page ' + row.id + ": " + row.path)
       pageData = row.data;
+      pageId = row.id;
     }
 
     if (req.query['edit'] != undefined) {        
-      renderEditorWithContent(pageData, res)
+       //renderEditorWithContent(pageData, res)
+
+        var data = {}
+        var options = {}
+
+        console.log('EDIT');
+
+        data.page = {}
+        data.page.id = pageId;
+
+        console.log(data);
+
+        ejs.renderFile('./templates/page_editor.ejs', data, options, function(err, str) {
+          res.send(str)
+        });
     }
     else {
       var data = {}
@@ -252,7 +307,9 @@ app.post('/*', (req, res) => {
               data = ?", [req._parsedUrl.pathname, req.body.content, req.body.content]);
 
   // Re-render the editor with the same content we just saved
-  renderEditorWithContent(req.body.content, res)
+  //renderEditorWithContent(req.body.content, res)
+
+  res.redirect(req._parsedUrl.pathname);
 });
 
 app.use('/', express.static(__dirname + '/static'));
