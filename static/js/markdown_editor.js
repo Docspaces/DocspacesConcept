@@ -1,4 +1,5 @@
-//
+import { marked } from "https://cdn.jsdelivr.net/npm/marked@4.2.12/lib/marked.esm.min.js";
+
 export function markdownEditorPageLoaded(pageId) {
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -25,6 +26,12 @@ export function markdownEditorPageLoaded(pageId) {
             },
             folding: false
         });
+
+        editor.getModel().onDidChangeContent((event) => {
+            document.getElementById('previewArea').innerHTML = marked.parse(editor.getValue());
+        });
+
+        document.getElementById('previewArea').innerHTML = marked.parse(originalData);
 
     });
 
