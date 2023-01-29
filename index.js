@@ -28,6 +28,30 @@ marked.setOptions({
   }
 });
 
+
+const wikiLinks = {
+  name: 'wikiLink',
+  level: 'inline',                                 // Is this a block-level or inline-level tokenizer?
+  start(src) { return src.match(/\[/)?.index; },    // Hint to Marked.js to stop and check for a match
+  tokenizer(src, tokens) {
+    const rule = /\[\[(.*?)\]\]/;  // Regex for the complete token, anchor to string start
+    const match = rule.exec(src);
+    if (match) {
+      return {                                         // Token to generate
+        type: 'wikiLink',                           // Should match "name" above
+        raw: match[0],                                 // Text to consume from the source
+        linkText: this.lexer.inlineTokens(match[1].trim()),  // Custom property
+      };
+    }
+  },
+  renderer(token) {
+    return `<a href="${this.parser.parseInline(token.linkText)}">${this.parser.parseInline(token.linkText)}</a>`;
+  },
+  childTokens: ['linkText'],                 // Any child tokens to be visited by walkTokens
+};
+
+marked.use({ extensions: [wikiLinks] });
+
 // Libraries to sanitise HTML
 const createDOMPurify = require('dompurify')
 const { JSDOM } = require('jsdom');
@@ -41,7 +65,8 @@ const app = express();
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
-//app.use(cors);
+app.use(cors());
+
 
 app.get('/diagrams/:id/edit', (req, res) => {
 
