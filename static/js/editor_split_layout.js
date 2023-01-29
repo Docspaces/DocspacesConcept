@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const newLeftWidth = Math.min(((resizer_leftWidth + dx) * 100) / resizer.parentNode.getBoundingClientRect().width, 75.0);
         leftPanel.style.width = `${newLeftWidth}%`;
+
+        rightPanel.style.maxWidth = `calc(${100-newLeftWidth}vw - 18px)`
     }
 
     const resizer_mouseup = function (e) {
