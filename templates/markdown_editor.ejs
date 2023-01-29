@@ -25,20 +25,24 @@
 <body>
 
     <div class="wrapper">
-        <div class="top-panel" style="padding:3px 10px; margin:0;">
-            <p style="margin:5px; font-family:helvetica; color:#7e92a7;">Docspaces Concept / Mermaid Editor</p>
+        <div class="top-panel" style="padding:0; margin:0;">
+            <div style="background-color:#597c9d; color:white; height:39px; min-height:39px; max-height: 39px; overflow: hidden;">
+                <p style="margin:0; font-size:20px; margin:8px 24px;">Docspaces Concept / Mermaid Editor</p>
+            </div>
+            <div style="background-color:#F4F4F4; height:41px; min-height:41px; max-height: 41px; margin:0;">
 
-            <form method=POST>
-                <input type=hidden id="save-content" name="content" />
+
+                <form method=POST>
+                    <input type=hidden id="save-content" name="content" />
+                    <button
+                        style="background:#eaeaea; border:solid 1px #DADADA; border-radius: 5px; top:30px; right:130px; padding:5px 18px;"
+                        id="btnSave">Save</button>
+                </form>
+
                 <button
-                    style="position:absolute; background:#eaeaea; border:solid 1px #DADADA; border-radius: 5px; top:30px; right:130px; padding:5px 18px;"
-                    id="btnSave">Save</button>
-            </form>
-
-            <button
-                style="position:absolute; background:#eaeaea; border:solid 1px #DADADA; border-radius: 5px; top:30px; right:50px; padding:5px 18px;"
-                id="btnClose">Exit</button>
-
+                    style="background:#eaeaea; border:solid 1px #DADADA; border-radius: 5px; top:30px; right:50px; padding:5px 18px;"
+                    id="btnClose">Exit</button>
+            </div>
         </div>
         <div class="bottom-panel">
 

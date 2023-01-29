@@ -192,6 +192,7 @@ app.get('/pages/:id/fetch', (req, res) => {
     res.send(row);
   }
   else {
+    res.status(200);
     res.send('');
   }
 });
