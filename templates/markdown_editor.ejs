@@ -1,0 +1,59 @@
+<html>
+
+<head>
+
+    <title>Docspaces - Edit Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="/css/editor_split_layout.css">
+    <script src="/js/editor_split_layout.js"></script>
+
+    <script type="module">
+        // We need to do this so we can pass values from EJS. We might change this, but it works ok for now
+        import { markdownEditorPageLoaded } from "/js/markdown_editor.js";
+        markdownEditorPageLoaded('<%= page.id %>');
+    </script>
+
+    <%- include('monaco_editor_common_includes') %>
+
+    <meta http-equiv="content-security-policy" content="default-src 'self'; script-src cdnjs.cloudflare.com; style-src cdnjs.cloudflare.com 'unsafe-inline';">
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <div class="top-panel" style="padding:3px 10px; margin:0;">
+            <p style="margin:5px; font-family:helvetica; color:#7e92a7;">Docspaces Concept / Mermaid Editor</p>
+
+            <form method=POST>
+                <input type=hidden id="save-content" name="content" />
+                <button
+                    style="position:absolute; background:#eaeaea; border:solid 1px #DADADA; border-radius: 5px; top:30px; right:130px; padding:5px 18px;"
+                    id="btnSave">Save</button>
+            </form>
+
+            <button
+                style="position:absolute; background:#eaeaea; border:solid 1px #DADADA; border-radius: 5px; top:30px; right:50px; padding:5px 18px;"
+                id="btnClose">Exit</button>
+
+        </div>
+        <div class="bottom-panel">
+
+            <div class="split-panel-container">
+                <div class="split-panel-container-left" style="width:50%">
+                    <div style="width:100%; height:100%;" id="editor"></div>
+                </div>
+                <div class="split-panel-container-resizer" id="split_view_resize_handle"></div>
+                <div class="split-panel-container-right" style="overflow: scroll;">
+
+                    Preview area
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

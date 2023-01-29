@@ -230,7 +230,7 @@ app.get(wikiRouteRegex, (req, res) => {
 
       console.log(data);
 
-      ejs.renderFile('./templates/page_editor.ejs', data, options, function (err, str) {
+      ejs.renderFile('./templates/markdown_editor.ejs', data, options, function (err, str) {
         res.send(str)
       });
     }
@@ -242,7 +242,7 @@ app.get(wikiRouteRegex, (req, res) => {
 
       data.output = DOMPurify.sanitize(processed);
 
-      ejs.renderFile('./templates/page_render.ejs', data, options, function (err, str) {
+      ejs.renderFile('./templates/markdown_render.ejs', data, options, function (err, str) {
         res.send(str)
       });
     }
