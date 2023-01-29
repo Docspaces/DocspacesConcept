@@ -4,6 +4,7 @@
 
     <title>Docspaces - Edit Page</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="content-security-policy" content="default-src 'self'; script-src 'unsafe-inline' localhost:3000 cdnjs.cloudflare.com cdn.jsdelivr.net; style-src localhost:3000 cdnjs.cloudflare.com 'unsafe-inline'; font-src cdnjs.cloudflare.com cdn.jsdelivr.net; worker-src localhost:3000;">
 
     <link rel="stylesheet" href="/css/editor_split_layout.css">
     <script src="/js/editor_split_layout.js"></script>
@@ -19,7 +20,6 @@
         configureMarkdownEditorOnDOMContentLoaded('<%= page.id %>', marked);
     </script>
 
-    <meta http-equiv="content-security-policy" content="default-src 'self'; script-src cdnjs.cloudflare.com cdn.jsdelivr.net; style-src cdnjs.cloudflare.com 'unsafe-inline';">
 </head>
 
 <body>
