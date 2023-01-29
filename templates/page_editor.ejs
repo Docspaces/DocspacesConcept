@@ -4,6 +4,10 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.min.css"
     integrity="sha512-GzcoZD7y5zvBofYtImXPZaPVhoY7xLPt+ysmbPb/vU+quSKFkcngxaSrxuwprDZL4MALUqGFmnqCxQZqMozv1Q=="
     crossorigin="anonymous" referrerpolicy="no-referrer">
+
+    <link rel="stylesheet" href="/css/editor_split_layout.css">
+    <script src="/js/editor_split_layout.js"></script>
+
 <script>
     var require = {
         paths: {
@@ -22,86 +26,86 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.js"
     integrity="sha512-BtSZPhzoyN8kq1axY6cgOFPSgLJgFwvAZ3WxeDGxEFXeFcFuK2s7Hr+zF75npVHASUY1dxudAfIVzwmgdR89Bw=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <meta http-equiv="content-security-policy" content="">
+
   </head>
   <body>
-    <!-- Following hidden div contains the data that will be loaded by the text editor -->
-    <div id=content style="display:none">output</div>
 
-    <a href="/">Nodebook Homepage</a> | <a href="/notes">index</a>
-    <hr/>
-    <!-- Following div will become the text editor -->
-    <div id=editor style="height:50%;"></div>
-    <hr/>
-    <!--
-    <div style="text-align: center">
-      <label style="border-right: 1px solid silver">
-        Markdown <input type="radio" name="inputformat" value="markdown" checked="">&nbsp;</label>
-      <label>&nbsp;<input type="radio" name="inputformat" value="prosemirror"> WYSIWYM</label>
+    <div class="wrapper">
+        <div class="top-panel" style="padding:3px 10px; margin:0;">
+            <p style="margin:5px; font-family:helvetica; color:#7e92a7;">Docspaces Concept / Mermaid Editor</p>
+
+                <form method=POST>
+                    <input type=hidden id="save-content" name="content" />
+                    <button
+                    style="position:absolute; background:#eaeaea; border:solid 1px #DADADA; border-radius: 5px; top:30px; right:130px; padding:5px 18px;"
+                    id="btnSave">Save</button>
+                </form>
+                <button
+                style="position:absolute; background:#eaeaea; border:solid 1px #DADADA; border-radius: 5px; top:30px; right:50px; padding:5px 18px;"
+                id="btnClose">Exit</button>
+
+        </div>
+        <div class="bottom-panel">
+
+            <div class="split-panel-container">
+                <div class="split-panel-container-left" style="width:50%">
+                    <div style="width:100%; height:100%;" id="editor"></div>
+                </div>
+                <div class="split-panel-container-resizer" id="split_view_resize_handle"></div>
+                <div class="split-panel-container-right" style="overflow: scroll;">
+
+                    Preview area
+
+                </div>
+            </div>
+
+        </div>
     </div>
-    -->
-    <!-- This form posts our data back to the server. An event handler on the button (added by app.js) will put the editor content in to the hidden field before posting --> 
-    <form method=POST>
-      <input type=hidden id="save-content" name="content" />
-      <button id="save">Save</button>
-    </form>
-    <hr/>
-    <script type="module">
-        import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.esm.min.mjs";
-        mermaid.initialize({ startOnLoad: true, securityLevel: 'antiscript', });
 
-        document.getElementById('save').addEventListener('click', function () {
+
+
+    <script>
+
+        let editor = null;
+
+        document.getElementById('btnSave').addEventListener('click', function () {
             document.getElementById('save-content').value = editor.getValue();
-            //alert(document.getElementById('save-content').value);
         });
 
-        var editor = monaco.editor.create(document.getElementById('editor'), {
-                value: '', //document.getElementById('content').innerText,
+        var originalData = '';
+
+        httpGet('/pages/<%= page.id %>/fetch').then(function (data) {
+
+            originalData = data.data;
+
+            editor = monaco.editor.create(document.getElementById('editor'), {
+                value: data.data, // Empty by default, we'll load from the api
                 automaticLayout: true,
                 scrollBeyondLastLine: false,
                 language: 'markdown',
                 minimap: {
                     enabled: false
                 },
-                //glyphMargin: false,
-                folding: false,
-                // Undocumented see https://github.com/Microsoft/vscode/issues/30795#issuecomment-410998882
-                // lineDecorationsWidth: 0,
+                folding: false
             });
 
-            var originalData = '';
+        });
 
-            var pageId = <%= page.id %>;
+        async function httpGet(url = '', data = {}) {
 
-            if (pageId > 0) {
-                getData('/pages/<%= page.id %>/fetch').then(function (data) {
+            const response = await fetch(url, {
+                method: 'GET',
+                mode: 'cors',
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer'
+            });
 
-                    originalData = data.data;
-
-                    editor.setValue(data.data);
-
-                });        
-            }
-
-
-
-            async function getData(url = '', data = {}) {
-
-                const response = await fetch(url, {
-                    method: 'GET',
-                    mode: 'cors', // no-cors, *cors, same-origin
-                    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-                    credentials: 'same-origin', // include, *same-origin, omit
-                    //headers: {
-                    //'Content-Type': 'application/json' // 'application/x-www-form-urlencoded',
-                    //},
-                    redirect: 'follow', // manual, *follow, error
-                    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-                    //body: JSON.stringify(data) // body data type must match "Content-Type" header
-                });
-
-                return response.json(); // parses JSON response into native JavaScript objects
-            }
+            return response.json();
+        }
 
     </script>
 

@@ -184,11 +184,16 @@ app.get('/pages/:id/fetch', (req, res) => {
   var data = {}
   var options = {}
 
+  if (req.params.id != '0') {
+
   var row = db.prepare("SELECT id, path, data FROM pages WHERE id = ?").get(req.params.id);
 
     res.status(200);
     res.send(row);
-
+  }
+  else {
+    res.send('');
+  }
 });
 
 let wikiRouteRegex = /^\/[a-zA-Z0-9%\/\-]*$/
