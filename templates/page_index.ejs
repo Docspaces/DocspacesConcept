@@ -2,7 +2,7 @@
 <html>
 <head>
     
-    <title>Docspaces - <%= pageName %></title>
+    <title>Docspaces - Index</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
@@ -12,7 +12,6 @@
         body { font-family: 'Lato', sans-serif; padding:0; margin:0; }
     </style>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
 </head>
 <body>
 
@@ -26,15 +25,18 @@
 
             <div style="flex-grow: 1;"></div>
             <div style="padding-right:20px">
-                <button
-                        style="cursor:pointer; color: white; background:#275bb6; border:solid 1px #2255BB; border-radius: 5px; top:30px; right:130px; padding:5px 18px;"
-                        id="btnEdit" onclick="window.location = window.location+'?edit'">Edit</button>
+
             </div>
         </div>
     </div>
     <div class="bottom-panel" style="padding:10px 40px;"">
 
-        <%- output %>
+        <h1>Index</h1>
+        <ul>
+            <% for(var i=0; i < pages.length; i++) { %>
+                <li><a href="<%= pages[i].path %>"><%= pages[i].path %></a></li>    
+            <% } %>
+        </ul>
 
     </div>
 </div>

@@ -78,8 +78,11 @@ app.get('/diagrams/:id/edit', (req, res) => {
   var row = db.prepare("SELECT id, name, data, type FROM diagrams WHERE id = ?").get(req.params.id);
 
   data.diagram = row;
+  data.diagramId = row.id;
 
-  var template = data.diagram.type == 'drawio' ? './templates/edit_drawio.ejs' : './templates/edit_mermaid.ejs';
+  var template = data.diagram.type == 'drawio' ? './templates/drawio_editor.ejs' : './templates/mermaid_editor.ejs';
+
+  console.log(template);  console.log(data);
 
   ejs.renderFile(template, data, options, function (err, str) {
 
@@ -197,6 +200,19 @@ app.get('/pages/:id/fetch', (req, res) => {
   }
 });
 
+app.get('/index', (req, res) => {
+
+  var data = {}
+  var options = {}
+
+  var rows = db.prepare("SELECT id, path FROM pages ORDER BY path").all();
+
+  ejs.renderFile('./templates/page_index.ejs', { pages: rows }, options, function (err, str) {
+    res.send(str)
+  });
+
+});
+
 let wikiRouteRegex = /^\/[a-zA-Z0-9%\/\-]*$/
 
 app.get(wikiRouteRegex, (req, res) => {
@@ -228,6 +244,7 @@ app.get(wikiRouteRegex, (req, res) => {
 
       data.page = {}
       data.page.id = pageId;
+      data.pathPath = pagePath;
 
       console.log(data);
 
@@ -242,6 +259,15 @@ app.get(wikiRouteRegex, (req, res) => {
       let processed = marked.parse(pageData); // <<-- produces an HTML string
 
       data.output = DOMPurify.sanitize(processed);
+      data.pathPath = pagePath;
+
+      if (pagePath.length > 1) {
+        data.pageName = pagePath.substring(pagePath.lastIndexOf('/') + 1);
+      }
+      else {
+        data.pageName = 'Home';
+      }
+      
 
       ejs.renderFile('./templates/markdown_render.ejs', data, options, function (err, str) {
         res.send(str)

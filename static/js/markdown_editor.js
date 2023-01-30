@@ -8,12 +8,18 @@ export function configureMarkdownEditorOnDOMContentLoaded(pageId, marked) {
             document.getElementById('save-content').value = editor.getValue();
         });
 
+        document.getElementById('btnClose').addEventListener('click', function () {
+            if (confirm('Are you sure? Any unsaved changes will be lost?')) {
+                window.location = window.location.pathname;
+            }
+        });
+       
         var originalData = '';
 
         // Some weirdness on the pageId 0 case -- the fetch does bring back blank data, so it should
         // work, but it's served as a 304 (or whatever) content not changed, and that messes with the
         // way I'm doing something, not sure why.
-        
+
         if (pageId == '0') {
 
             editor = monaco.editor.create(document.getElementById('editor'), {

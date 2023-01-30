@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/editor_split_layout.css">
+    <script src="/js/editor_split_layout.js"></script>
+
+    <style>
+        body { font-family: 'Lato', sans-serif; }
+    </style>
+
+
+    <style type="text/css">
+
+        button {
+            border-top: solid 1px #EEE;
+            border-left: solid 1px #EEE;
+            border-bottom: solid 1px #999;
+            border-right: solid 1px #999;
+            background-color: #CFCFCF;
+        }
+
+        button:hover {
+            background-color: #BFBFBF;
+        }
+
+        button:active {
+            border-right: solid 1px #EEE;
+            border-bottom: solid 1px #EEE;
+            border-left: solid 1px #999;
+            border-top: solid 1px #999;
+            background-color: #BFBFBF;
+        }
+
+        a#lnkChangeName,
+        a#lnkChangeName:visited {
+            font-size: 10px;
+            text-decoration: none;
+            display: inline-block;
+            color: #5b6570;
+        }
+
+
+        .errorIcon {
+            display: block;
+
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-color: #FFAAAA;
+        }
+    </style>
+
+    <%- include('monaco_editor_common_includes') %>
+
+    <script type="module">
+        
+        import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.esm.min.mjs";
+        
+        // We need to do this so we can pass values from EJS. We might change this, but it works ok for now
+        import { configureMermaidEditorOnDOMContentLoaded } from "/js/mermaid_editor.js";
+
+        configureMermaidEditorOnDOMContentLoaded('<%= diagramId %>', mermaid);
+
+    </script>
+
+
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="top-panel" style="padding:0; margin:0;">
+            <div style="background-color:white; color: #597c9d; height:39px; min-height:39px; max-height: 39px; overflow: hidden; border-bottom:solid 1px #e8e8e8;">
+                <a href="/"><img src="/images/ArctusBoxLogo.png" style="border-radius:3px; left:9px; top:6px; width:28px; height:28px; float:left; position:absolute"/></a>
+                <p style="margin:0; font-size:18px; font-weight:300; margin:8px 24px 0px 48px;">Docspaces - Edit Diagram (mermaid)</p>
+            </div>
+            <div style="display:flex; flex-direction: row; align-items:center; background-color:#F4F4F4; height:41px; min-height:40px; max-height: 40px; margin:0; border-bottom:solid 1px #ccc;">
+
+                <div style="flex-grow: 1;"></div>
+                <div style="padding-right:20px">
+                    <button
+                        style="cursor:pointer; color: white; background:#275bb6; border:solid 1px #2255BB; border-radius: 5px; top:30px; right:130px; padding:5px 18px;"
+                        id="btnSave">Save</button>
+
+                    <button
+                    style="cursor:pointer; background:#eaeaea; border:solid 1px #DADADA; border-radius: 5px; top:30px; right:50px; padding:5px 18px;"
+                    id="btnClose">Exit</button>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-panel">
+
+            <div class="split-panel-container">
+                <div class="split-panel-container-left">
+                    <div style="width:100%; height:100%;" id="txtDiagramData"></div>
+                </div>
+                <div class="split-panel-container-resizer" id="split_view_resize_handle"></div>
+                <div class="split-panel-container-right" style="overflow: scroll;">
+                    <h1
+                        style="position:relative; margin:0 0 20px 0; font-family:sans-serif; font-size:20px; padding-bottom:15px; border-bottom:solid 1px #E4E4E4;">
+                        <span id="lblName"><%= diagram.name %></span> <a href="#" id="lnkChangeName">rename</a></a>
+                    </h1>
+                    <div id="diagram_area" style="margin-top:0px;"></div>
+                    <button
+                        style="position:absolute; background:#EAEAEA; border:solid 1px #DADADA; border-radius: 5px; top:110px; right:50px; padding:5px 18px;"
+                        id="btnZoom">Zoom</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
