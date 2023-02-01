@@ -71,7 +71,7 @@ body {
             if (msg.event == 'configure') {
                 iframe.contentWindow.postMessage(JSON.stringify(
                     { action: 'configure', config: { 
-                        //"css": ".geMenubarContainer { background-color: #c0c0c0 !important; } .geMenubar { background-color: #c0c0c0 !important; }"                  
+                        //"css": ".geMenubarContainer { background-color: white !important; border-bottom: solid 1px #ccc; } .geMenubar { background-color: white !important; } .geItem { color:black !important; } .geItem:hover { color:black !important; background-color: white !important; }"                  
                     } }), '*');
             }
             else if (msg.event == 'init') {

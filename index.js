@@ -153,14 +153,14 @@ app.post('/diagrams/:id/rename', (req, res) => {
   } else {
 
     db.prepare("UPDATE diagrams SET name = ? WHERE id = ?").run(req.body.name, req.params.id);
-      
+    
     res.status(200);
     res.send({ status: "OK" });
   }
 
 });
 
-app.get('/diagrams', (req, res) => {
+app.get('/documents', (req, res) => {
 
   var data = {}
   var options = {}
@@ -169,7 +169,7 @@ app.get('/diagrams', (req, res) => {
 
     data.diagrams = rows
 
-    ejs.renderFile('./templates/index.ejs', data, options, function (err, str) {
+    ejs.renderFile('./templates/document_index.ejs', data, options, function (err, str) {
       if (err) {
         res.status(500);
         res.send(err.message);
