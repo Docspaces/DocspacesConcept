@@ -58,6 +58,38 @@ const DOMPurify = createDOMPurify(window)
 
 //////
 
+
+router.get('/pages/:id/fetch', (req, res) => {
+
+  var data = {}
+  var options = {}
+
+  if (req.params.id != '0') {
+
+    var row = this.db.prepare("SELECT id, path, data FROM pages WHERE id = ?").get(req.params.id);
+
+    res.status(200);
+    res.send(row);
+  }
+  else {
+    res.status(200);
+    res.send('');
+  }
+});
+
+router.get('/index', (req, res) => {
+
+  var data = {}
+  var options = {}
+
+  var rows = this.db.prepare("SELECT id, path FROM pages ORDER BY path").all();
+
+  ejs.renderFile('./templates/page_index.ejs', { pages: rows }, options, function (err, str) {
+    res.send(str)
+  });
+
+});
+
 let wikiRouteRegex = /^\/[a-zA-Z0-9%\/\-]*$/
 
 router.get(wikiRouteRegex, (req, res) => {
@@ -71,54 +103,53 @@ router.get(wikiRouteRegex, (req, res) => {
 
   var row = this.db.prepare("SELECT * FROM pages WHERE path = ?").get(pagePath);
 
-    var pageData = '';
-    var pageId = 0;
+  var pageData = '';
+  var pageId = 0;
 
+  if (row) {
+    console.log('Loaded page ' + row.id + ": " + row.path)
+    pageData = row.data;
+    pageId = row.id;
+  }
 
-    if (row) {
-      console.log('Loaded page ' + row.id + ": " + row.path)
-      pageData = row.data;
-      pageId = row.id;
-    }
+  if (req.query['edit'] != undefined) {
 
-    if (req.query['edit'] != undefined) {
+    var data = {}
+    var options = {}
 
-      var data = {}
-      var options = {}
+    console.log('EDIT');
 
-      console.log('EDIT');
+    data.page = {}
+    data.page.id = pageId;
+    data.pathPath = pagePath;
 
-      data.page = {}
-      data.page.id = pageId;
-      data.pathPath = pagePath;
+    console.log(data);
 
-      console.log(data);
+    ejs.renderFile('./templates/pages/markdown_editor.ejs', data, options, function (err, str) {
+      res.send(str)
+    });
+  }
+  else {
+    var data = {}
+    var options = {}
 
-      ejs.renderFile('./templates/pages/markdown_editor.ejs', data, options, function (err, str) {
-        res.send(str)
-      });
+    let processed = marked.parse(pageData); // <<-- produces an HTML string
+
+    data.output = DOMPurify.sanitize(processed);
+    data.pathPath = pagePath;
+
+    if (pagePath.length > 1) {
+      data.pageName = pagePath.substring(pagePath.lastIndexOf('/') + 1);
     }
     else {
-      var data = {}
-      var options = {}
-
-      let processed = marked.parse(pageData); // <<-- produces an HTML string
-
-      data.output = DOMPurify.sanitize(processed);
-      data.pathPath = pagePath;
-
-      if (pagePath.length > 1) {
-        data.pageName = pagePath.substring(pagePath.lastIndexOf('/') + 1);
-      }
-      else {
-        data.pageName = 'Home';
-      }
-      
-
-      ejs.renderFile('./templates/pages/markdown_render.ejs', data, options, function (err, str) {
-        res.send(str)
-      });
+      data.pageName = 'Home';
     }
+
+
+    ejs.renderFile('./templates/pages/markdown_render.ejs', data, options, function (err, str) {
+      res.send(str)
+    });
+  }
 
 });
 
@@ -143,6 +174,6 @@ router.post(wikiRouteRegex, (req, res) => {
 });
 
 module.exports = (db) => {
-    this.db = db;
-    return router;
+  this.db = db;
+  return router;
 }

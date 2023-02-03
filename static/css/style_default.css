@@ -41,5 +41,14 @@ h1, h2, h3, h4, h5, h6, p {
     min-height:39px; 
     max-height: 39px; 
     overflow: hidden; 
-    border-bottom:solid 1px #ccc;
+    border-bottom:solid 1px #e4e4e4;
+    line-height: 1.4;
+}
+
+.toolbar_main > .main_title {
+    margin:0; font-size:18px; margin:8px 24px 0px 48px;
+}
+
+.toolbar_main > .main_title > .subtitle {
+    font-style:normal; font-size:12px; margin-left:3px; top:-5px; position:relative; color:#799cbd;
 }
