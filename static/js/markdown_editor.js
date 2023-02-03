@@ -51,7 +51,8 @@ export function configureMarkdownEditorOnDOMContentLoaded(pageId, marked) {
                     minimap: {
                         enabled: false
                     },
-                    folding: false
+                    folding: false,
+                    wordWrap: true
                 });
 
                 editor.getModel().onDidChangeContent((event) => {
