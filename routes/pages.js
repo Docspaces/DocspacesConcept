@@ -66,7 +66,7 @@ router.get('/pages/:id/fetch', (req, res) => {
 
   if (req.params.id != '0') {
 
-    var row = this.db.prepare("SELECT id, path, data FROM pages WHERE id = ?").get(req.params.id);
+    var row = this.db.get_page_by_id(req.params.id);
 
     res.status(200);
     res.send(row);
@@ -101,7 +101,7 @@ router.get(wikiRouteRegex, (req, res) => {
     pagePath = pagePath.substring(0, pagePath.length - 1);
   }
 
-  var row = this.db.prepare("SELECT * FROM pages WHERE path = ?").get(pagePath);
+  var row = this.db.get_page_for_path(pagePath);
 
   var pageData = '';
   var pageId = 0;
@@ -163,11 +163,7 @@ router.post(wikiRouteRegex, (req, res) => {
     pagePath = pagePath.substring(0, pagePath.length - 1);
   }
 
-  // This is a funny Sqlite specific way to update-or-insert in a single statement, just for simplicity
-  this.db.prepare("INSERT INTO pages (path, data) \
-            VALUES(?, ?) \
-            ON CONFLICT(path) DO UPDATE SET \
-              data = ?").run(pagePath, req.body.content, req.body.content);
+  this.db.update_page_at_path(pagePath, req.body.content);
 
   res.redirect(req._parsedUrl.pathname);
 

@@ -13,7 +13,7 @@ router.get("/diagrams/:id/edit", (req, res) => {
     var data = {};
     var options = {};
     var template = "";
-    var row = this.db.prepare("SELECT id, name, data, type FROM diagrams WHERE id = ?").get(req.params.id);
+    var row = this.db.get_document_by_id(req.params.id);
   
     data.diagram = row;
     data.diagramId = row.id;
@@ -34,7 +34,7 @@ router.get("/diagrams/:id/edit", (req, res) => {
     var data = {}
     var options = {}
   
-    var row = this.db.prepare("SELECT id, name, data, type FROM diagrams WHERE id = ?").get(req.params.id);
+    var row = this.db.get_document_by_id(req.params.id);
   
     res.status(200);
     res.send(row);
@@ -58,7 +58,7 @@ router.get("/diagrams/:id/edit", (req, res) => {
         defaultData = `sequenceDiagram`;
       }
   
-      var row = this.db.prepare("INSERT INTO diagrams (name, type, data) VALUES (?, ?, ?) RETURNING id").get(req.body.name, req.body.diagramType, defaultData);
+      var row = this.db.create_diagram(req.body.name, req.body.diagramType, defaultData);
   
       res.status(200);
       res.send({ id: row.id });
@@ -73,7 +73,7 @@ router.get("/diagrams/:id/edit", (req, res) => {
       res.send('Missing id');
     } else {
   
-      this.db.prepare("UPDATE diagrams SET data = ? WHERE id = ?").run(req.body.data, req.params.id);
+      this.db.update_document_data(req.params.id, req.body.data);
   
       res.status(200);
       res.send({ status: "OK" });
@@ -88,7 +88,7 @@ router.get("/diagrams/:id/edit", (req, res) => {
       res.send('Missing id');
     } else {
   
-      this.db.prepare("UPDATE diagrams SET name = ? WHERE id = ?").run(req.body.name, req.params.id);
+      this.db.rename_document_with_id(req.params.id, req.body.name);
   
       res.status(200);
       res.send({ status: "OK" });
@@ -101,7 +101,7 @@ router.get("/diagrams/:id/edit", (req, res) => {
     var data = {}
     var options = {}
   
-    var rows = this.db.prepare("SELECT id, name, type FROM diagrams ORDER BY name").all();
+    var rows = this.db.get_documents_for_index();
   
       data.diagrams = rows
   
