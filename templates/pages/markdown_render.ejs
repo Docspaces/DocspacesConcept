@@ -14,24 +14,23 @@
 <body>
 
 <div class="wrapper">
-    <div class="top-panel" style="padding:0; margin:0;">
-        <div class="toolbar_main">
+    <div class="header-page-area">
+        <div class="header-top">
             <a href="/"><img src="/images/ArctusBoxLogo.png" style="border-radius:3px; left:9px; top:6px; width:28px; height:28px; float:left; position:absolute"/></a>
             <p class="main_title">Docspaces <span class="subtitle">early preview</span></p>
         </div>
-        <div style="display:flex; flex-direction: row; align-items:center; background-color:#F4F4F4; height:41px; min-height:40px; max-height: 40px; margin:0; border-bottom:solid 1px #ccc;">
-
+        <div class="header-toolbar">
             <div style="flex-grow: 1;"></div>
             <div style="padding-right:40px">
-                <button class="toolbar_action_button" id="btnEdit" onclick="window.location = window.location+'?edit'">Edit</button>
+                <button class="toolbar_button toolbar_button_primary" id="btnEdit" onclick="window.location = window.location+'?edit'">Edit</button>
             </div>
         </div>
     </div>
-    <div class="bottom-panel" style="display:flex; flex-direction: row;">
-        <div style="width:200px; min-width:200px; min-height:calc(100vh - 80px); border-right:solid 1px #DADADA; background:#fdfdfd; padding:20px 20px;">
-            Navigation        
+    <div class="main-page-area">
+        <div class="left-nav-panel">
+            Navigation
         </div>
-        <div style="flex-grow:1; padding:10px 40px;">
+        <div class="content-panel">
             <%- output %>
         </div>
         
