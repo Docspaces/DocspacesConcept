@@ -104,7 +104,7 @@ export function configureMermaidEditorOnDOMContentLoaded(diagramId, mermaid) {
 
             }
 
-            window.location = '/';
+            window.location = '/documents';
 
             /*
             if (confirm("Save before closing?")) { // This isn't great
