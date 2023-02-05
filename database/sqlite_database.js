@@ -42,6 +42,52 @@ class SqliteDatabase {
     create_diagram(name, type, data) {
         return this.db.prepare("INSERT INTO diagrams (name, type, data) VALUES (?, ?, ?) RETURNING id").get(name, type, data);
     }
+
+    get_navigation_links_for_current_page(current_page) {
+        //console.log('get_navigation_links_for_current_page('+current_page+')');
+
+        var results = {}
+        results.siblings = [];
+        results.children = [];
+
+        if (current_page.length > 1) {
+            var parentPage = current_page.substring(0, current_page.lastIndexOf('/'));
+            
+            if (parentPage != "/" && parentPage != "") {
+                results.parentPage = parentPage;
+            }
+
+            console.log('parentPage = ' + parentPage);
+
+            results.siblings = this.db.prepare("SELECT id, path FROM pages WHERE path not like '/' and path like ? and path not like ? ORDER BY path")
+                .all(`${parentPage}/%`,
+                     `${parentPage}/%/%`);
+
+            results.children = this.db.prepare("SELECT id, path FROM pages WHERE path like ? and path not like ? ORDER BY path")
+                 .all(`${current_page == "/" ? "" : current_page}/%`, 
+                      `${current_page == "/" ? "" : current_page}/%/%`);
+        }
+        else {
+
+            results.parentPage = null;
+
+            results.siblings = this.db.prepare("SELECT id, path FROM pages WHERE path not like '/' and path like ? and path not like ? ORDER BY path")
+            .all("/%", "/%/%");
+                // this.db.prepare("SELECT id, path FROM pages WHERE path like ?")
+                //.all("/");
+ 
+            //results.children = this.db.prepare("SELECT id, path FROM pages WHERE path like ? and path not like ? ORDER BY path")
+            //     .all("/%", "/%/%");
+        }
+
+
+
+        return results;
+    }
+
+    get_all_pages_for_index() {
+        return this.db.prepare("SELECT id, path FROM pages ORDER BY path").all();
+    }
 }
 
 

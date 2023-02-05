@@ -3,18 +3,19 @@ export function configureMarkdownEditorOnDOMContentLoaded(pageId, marked) {
     document.addEventListener('DOMContentLoaded', function () {
 
         let editor = null;
+        var originalData = '';
+        var changed = false;
 
         document.getElementById('btnSave').addEventListener('click', function () {
             document.getElementById('save-content').value = editor.getValue();
         });
 
         document.getElementById('btnClose').addEventListener('click', function () {
-            if (confirm('Are you sure? Any unsaved changes will be lost?')) {
+            if (!changed || confirm('Are you sure? Any unsaved changes will be lost?')) {
                 window.location = window.location.pathname;
             }
         });
        
-        var originalData = '';
 
         // Some weirdness on the pageId 0 case -- the fetch does bring back blank data, so it should
         // work, but it's served as a 304 (or whatever) content not changed, and that messes with the
@@ -57,6 +58,8 @@ export function configureMarkdownEditorOnDOMContentLoaded(pageId, marked) {
 
                 editor.getModel().onDidChangeContent((event) => {
                     document.getElementById('previewArea').innerHTML = marked.parse(editor.getValue());
+
+                    changed = true;
                 });
 
                 document.getElementById('previewArea').innerHTML = marked.parse(originalData);

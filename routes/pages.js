@@ -38,7 +38,8 @@ const wikiLinks = {
     }
   },
   renderer(token) {
-    return `<a href="${this.parser.parseInline(token.linkText)}">${this.parser.parseInline(token.linkText)}</a>`;
+    let linkText = this.parser.parseInline(token.linkText);
+    return `<a href="${linkText.startsWith('/') ? linkText : linkText}">${this.parser.parseInline(token.linkText)}</a>`;
   },
   childTokens: ['linkText'], // Any child tokens to be visited by walkTokens
 };
@@ -82,7 +83,12 @@ router.get('/index', (req, res) => {
   var data = {}
   var options = {}
 
-  var rows = this.db.prepare("SELECT id, path FROM pages ORDER BY path").all();
+  var pagePath = req._parsedUrl.pathname.toLowerCase();
+  if (pagePath.length > 1 && pagePath.endsWith('/')) {
+    pagePath = pagePath.substring(0, pagePath.length - 1);
+  }
+
+  var rows = this.db.get_all_pages_for_index(pagePath);
 
   ejs.renderFile('./templates/page_index.ejs', { pages: rows }, options, function (err, str) {
     res.send(str)
@@ -102,6 +108,7 @@ router.get(wikiRouteRegex, (req, res) => {
   }
 
   var row = this.db.get_page_for_path(pagePath);
+  var related = this.db.get_navigation_links_for_current_page(pagePath);
 
   var pageData = '';
   var pageId = 0;
@@ -136,7 +143,10 @@ router.get(wikiRouteRegex, (req, res) => {
     let processed = marked.parse(pageData); // <<-- produces an HTML string
 
     data.output = DOMPurify.sanitize(processed);
-    data.pathPath = pagePath;
+    data.pagePath = pagePath;
+    data.related = related;
+
+    console.log(data);
 
     if (pagePath.length > 1) {
       data.pageName = pagePath.substring(pagePath.lastIndexOf('/') + 1);
@@ -144,7 +154,6 @@ router.get(wikiRouteRegex, (req, res) => {
     else {
       data.pageName = 'Home';
     }
-
 
     ejs.renderFile('./templates/pages/markdown_render.ejs', data, options, function (err, str) {
       res.send(str)
