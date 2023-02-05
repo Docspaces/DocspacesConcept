@@ -2,33 +2,26 @@
 <html>
 
 <head>
-
-    <title>Docspaces - <%= pageName %>
-    </title>
+    <title>Docspaces - <%= pageName %></title>
 
     <link rel="stylesheet" href="/css/reset.css">
     <link rel="stylesheet" href="/css/style_default.css">
 
     <%- include('../site_font_common_includes') %>
 
-        <link rel="stylesheet"
-            href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <link rel="stylesheet" href="/css/highlight.css">
 </head>
-
 <body>
-
     <div class="wrapper">
         <div class="header-page-area">
             <div class="header-top">
-                <a href="/"><img src="/images/ArctusBoxLogo.png"
-                        style="border-radius:3px; left:9px; top:6px; width:28px; height:28px; float:left; position:absolute" /></a>
+                <a href="/"><img src="/images/ArctusBoxLogo.png" style="border-radius:3px; left:9px; top:6px; width:28px; height:28px; float:left; position:absolute" /></a>
                 <p class="main_title">Docspaces <span class="subtitle">early preview</span></p>
             </div>
             <div class="header-toolbar">
                 <div style="flex-grow: 1;"></div>
                 <div style="padding-right:40px">
-                    <button class="toolbar_button toolbar_button_primary" id="btnEdit"
-                        onclick="window.location = window.location+'?edit'">Edit</button>
+                    <button class="toolbar_button toolbar_button_primary" id="btnEdit" onclick="window.location = window.location+'?edit'">Edit</button>
                 </div>
             </div>
         </div>
@@ -81,7 +74,5 @@
             </div>
         </div>
     </div>
-
 </body>
-
 </html>
