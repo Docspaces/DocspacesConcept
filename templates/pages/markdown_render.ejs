@@ -48,7 +48,7 @@
                                     <li class="selected"><a href="<%= related.siblings[i].path %>"><%= related.siblings[i].path.substring(related.siblings[i].path.lastIndexOf('/') + 1) %></a></li>
 
                                     <% if (related.children !=null && related.children.length> 0) { %>
-                                    <li>
+                                    <li class="selected-children">
                                         <ul>
                                             <% for(var j=0; j < related.children.length; j++) { %>
                                                 <li><a href="<%= related.children[j].path %>"><%= related.children[j].path.substring(related.children[j].path.lastIndexOf('/') + 1) %></a></li>

@@ -114,5 +114,7 @@ p {
 .left-nav-panel li { padding:0; padding-left:10px; margin:0; }
 .left-nav-panel a:link, .left-nav-panel a:visited { color: #3c4689; }
 
-.left-nav-panel li.selected { font-weight:bold; text-decoration: none; background-color: #eaeaea; }
+.left-nav-panel li.selected { font-weight:normal; text-decoration: none; background-color: #eaeaea; }
 .left-nav-panel li.selected a:link, .left-nav-panel li.selected a:visited { }
+
+.left-nav-panel li.selected-children { border-left:none; padding-left:10px; }
