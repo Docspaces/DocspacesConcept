@@ -1,84 +1,87 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    
-    <title>Docspaces - <%= pageName %></title>
+
+    <title>Docspaces - <%= pageName %>
+    </title>
 
     <link rel="stylesheet" href="/css/reset.css">
     <link rel="stylesheet" href="/css/style_default.css">
 
     <%- include('../site_font_common_includes') %>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
 </head>
+
 <body>
 
-<div class="wrapper">
-    <div class="header-page-area">
-        <div class="header-top">
-            <a href="/"><img src="/images/ArctusBoxLogo.png" style="border-radius:3px; left:9px; top:6px; width:28px; height:28px; float:left; position:absolute"/></a>
-            <p class="main_title">Docspaces <span class="subtitle">early preview</span></p>
+    <div class="wrapper">
+        <div class="header-page-area">
+            <div class="header-top">
+                <a href="/"><img src="/images/ArctusBoxLogo.png"
+                        style="border-radius:3px; left:9px; top:6px; width:28px; height:28px; float:left; position:absolute" /></a>
+                <p class="main_title">Docspaces <span class="subtitle">early preview</span></p>
+            </div>
+            <div class="header-toolbar">
+                <div style="flex-grow: 1;"></div>
+                <div style="padding-right:40px">
+                    <button class="toolbar_button toolbar_button_primary" id="btnEdit"
+                        onclick="window.location = window.location+'?edit'">Edit</button>
+                </div>
+            </div>
         </div>
-        <div class="header-toolbar">
-            <div style="flex-grow: 1;"></div>
-            <div style="padding-right:40px">
-                <button class="toolbar_button toolbar_button_primary" id="btnEdit" onclick="window.location = window.location+'?edit'">Edit</button>
+        <div class="main-page-area">
+            <div class="left-nav-panel">
+                <p>Pages</p>
+                <ul>
+                    <% if (pagePath=="/" ) { %>
+                        <li class="selected"><a href="/">Homepage</a></li>
+                    <% } else { %>
+                        <li><a href="/">Homepage</a></li>
+                    <% } %>
+
+                    <li>
+                        <ul>
+                            <% if (related.parentPage !=null) { %>
+                                <li><a href="<%= related.parentPage %>"><%= related.parentPage.substring(related.parentPage.lastIndexOf('/') + 1) %></a></li>
+                                <li>
+                                    <ul>
+                            <% } %>
+
+                            <% for(var i=0; i < related.siblings.length; i++) { %>
+                                <% if (related.siblings[i].path == pagePath) { %>
+                                    <li class="selected"><a href="<%= related.siblings[i].path %>"><%= related.siblings[i].path.substring(related.siblings[i].path.lastIndexOf('/') + 1) %></a></li>
+
+                                    <% if (related.children !=null && related.children.length> 0) { %>
+                                    <li>
+                                        <ul>
+                                            <% for(var j=0; j < related.children.length; j++) { %>
+                                                <li><a href="<%= related.children[j].path %>"><%= related.children[j].path.substring(related.children[j].path.lastIndexOf('/') + 1) %></a></li>
+                                            <% } %>
+                                        </ul>
+                                    </li>
+                                    <% } %>
+                                <% } else { %>
+                                    <li><a href="<%= related.siblings[i].path %>"><%= related.siblings[i].path.substring(related.siblings[i].path.lastIndexOf('/')+ 1) %></a></li>
+                                <% } %>
+                            <% } %>
+
+                            <% if (related.parentPage !=null) { %>
+                                    </ul>
+                                </li>
+                            <% } %>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="content-panel">
+                <%- output %>
             </div>
         </div>
     </div>
-    <div class="main-page-area">
-        <div class="left-nav-panel">
-            <p>Pages</p>
-            <ul>
-                <% if (pagePath ==  "/") { %>
-                    <li class="selected"><a href="/">Homepage</a></li>
-                <% } else { %>
-                    <li><a href="/">Homepage</a></li>
-                <% } %>
-                <li>
-                    <ul>
-                <% if (related.parentPage != null) { %>
-                    <li><a href="<%= related.parentPage %>"><%= related.parentPage.substring(related.parentPage.lastIndexOf('/') + 1) %></a></li>
-                    <li><ul>
-                <% } %>
-
-                <% for(var i = 0; i < related.siblings.length; i++) { %>
-                    <% if (related.siblings[i].path == pagePath) { %>
-                        <li class="selected"><a href="<%= related.siblings[i].path %>"><%= related.siblings[i].path.substring(related.siblings[i].path.lastIndexOf('/') + 1) %></a></li>
-                        
-                        <% if (related.children != null && related.children.length > 0) { %>
-                            <li>
-                                <ul>
-
-                            <% for(var j = 0; j < related.children.length; j++) { %>
-                                <li><a href="<%= related.children[j].path %>"><%= related.children[j].path.substring(related.children[j].path.lastIndexOf('/') + 1) %></a></li>
-                            <% } %>
-
-                                </ul>
-                            </li>
-                        <% } %>
-        
-                    <% } else { %>
-                        <li><a href="<%= related.siblings[i].path %>"><%= related.siblings[i].path.substring(related.siblings[i].path.lastIndexOf('/') + 1) %></a></li>
-                    <% } %>
-                <% } %>
-
-                <% if (related.parentPage != null) { %>
-                </li></ul>
-                <% } %>
-
-                    </ul>
-                    </li>
-
-
-            </ul>
-        </div>
-        <div class="content-panel">
-            <%- output %>
-        </div>
-        
-    </div>
-</div>
 
 </body>
+
 </html>
