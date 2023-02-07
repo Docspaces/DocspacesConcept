@@ -53,7 +53,21 @@ export function configureMarkdownEditorOnDOMContentLoaded(pageId, marked) {
                         enabled: false
                     },
                     folding: false,
-                    wordWrap: true
+                    wordWrap: true,
+                    // Disable intellisense stuff because it just doesn't make sense in this setup
+                    quickSuggestions: {
+                        "other": false,
+                        "comments": false,
+                        "strings": false
+                    },
+                    parameterHints: {
+                        enabled: false
+                    },
+                    ordBasedSuggestions: false,
+                    acceptSuggestionOnEnter: "off",
+                    suggestOnTriggerCharacters: false,
+                    tabCompletion: "off",
+                    wordBasedSuggestions: false
                 });
 
                 editor.getModel().onDidChangeContent((event) => {
