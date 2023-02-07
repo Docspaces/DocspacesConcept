@@ -56,9 +56,7 @@ const e = require('express');
 const window = new JSDOM('').window
 const DOMPurify = createDOMPurify(window)
 
-
-//////
-
+/////
 
 router.get('/pages/:id/fetch', (req, res) => {
 
@@ -140,13 +138,19 @@ router.get(wikiRouteRegex, (req, res) => {
     var data = {}
     var options = {}
 
-    let processed = marked.parse(pageData); // <<-- produces an HTML string
+    if (pageData != '') {
+      let processed = marked.parse(pageData); // <<-- produces an HTML string
 
-    data.output = DOMPurify.sanitize(processed);
+      data.output = DOMPurify.sanitize(processed);
+    }
+    else {
+      ejs.renderFile('./templates/pages/page_not_found.ejs', { "pagePath": pagePath }, {}, function (err, str) {
+        data.output = str;
+        console.log(data);
+      });
+    }
     data.pagePath = pagePath;
     data.related = related;
-
-    console.log(data);
 
     if (pagePath.length > 1) {
       data.pageName = pagePath.substring(pagePath.lastIndexOf('/') + 1);

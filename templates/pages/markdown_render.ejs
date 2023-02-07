@@ -15,11 +15,23 @@
     <div class="wrapper">
         <div class="header-page-area">
             <div class="header-top">
-                <a href="/"><img src="/images/ArctusBoxLogo.png" style="border-radius:3px; left:9px; top:6px; width:28px; height:28px; float:left; position:absolute" /></a>
-                <p class="main_title">Docspaces <span class="subtitle">early preview</span></p>
+                <div style="display:flex; flex-direction: row; justify-content: space-between; align-items: center; padding:0 20px 20px 0;">
+                    <div>
+                        <a href="/"><img src="/images/ArctusBoxLogo.png" style="border-radius:3px; left:9px; top:6px; width:28px; height:28px; float:left; position: absolute;" /></a>
+                        <div style="margin-left:50px;">
+                            <p class="main_title">Docspaces <span class="subtitle">early preview</span></p>
+                        </div>
+                    </div>
+                    <div>
+                        Not logged in
+
+                    </div>
+                </div>
             </div>
             <div class="header-toolbar">
-                <div style="flex-grow: 1;"></div>
+                <div style="flex-grow: 1; padding-left:18px;">
+                    <button class="toolbar_button toolbar_button_primary">Create Page</button>
+                </div>
                 <div style="padding-right:40px">
                     <button class="toolbar_button toolbar_button_primary" id="btnEdit" onclick="window.location = window.location+'?edit'">Edit</button>
                 </div>
@@ -27,7 +39,14 @@
         </div>
         <div class="main-page-area">
             <div class="left-nav-panel">
-                <p>Pages</p>
+                <div style="display:flex; flex-direction: row; justify-content: space-between; align-items: center; padding:0 0 20px 0;">
+                    <p style="margin:0;">
+                        Pages
+                    </p>
+                    <div>
+                        <!--<button class="toolbar_button">Create</button>-->
+                    </div>
+                </div>
                 <ul>
                     <% if (pagePath=="/" ) { %>
                         <li class="selected"><a href="/">Homepage</a></li>
