@@ -6,6 +6,7 @@ class SqliteDatabase {
     migrate() {
         this.db.prepare('CREATE TABLE IF NOT EXISTS diagrams (id integer primary key autoincrement, name text not null, data text not null, type varchar(50) not null)').run();
         this.db.prepare('CREATE TABLE IF NOT EXISTS pages (id integer primary key autoincrement, path text not null unique, data text not null)').run();
+        this.db.prepare('CREATE TABLE IF NOT EXISTS organisation (id integer primary key autoincrement, path text not null unique, data text not null)').run();
     }
 
     get_page_by_id(page_id) {

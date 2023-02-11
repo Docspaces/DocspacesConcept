@@ -100,33 +100,98 @@ p {
     width: 250px;
     min-width: 250px;
     min-height: calc(100vh - 80px);
-    border-right: solid 1px #f2f2f2; xxx:e4e4e4;
+    border-right: solid 1px #f2f2f2;
+    xxx: e4e4e4;
     zsbackground: #fdfdfd;
     padding: 20px 20px;
 }
 
 .main-page-area>.content-panel {
-    flex-grow:1; 
-    padding:10px 40px;
+    flex-grow: 1;
+    padding: 10px 40px;
 }
 
-.left-nav-panel ul { list-style: none; margin:0; padding:0; }
-.left-nav-panel li { padding:3px; padding-left:10px; margin:0px 0; }
-.left-nav-panel a:link, .left-nav-panel a:visited { color: #3c4689; }
+.left-nav-panel ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
 
-.left-nav-panel li.selected { font-weight:bold; text-decoration: none; background-color: rgb(232, 235, 237); border-radius: 2px;}
-.left-nav-panel li.selected a:link, .left-nav-panel li.selected a:visited { }
+.left-nav-panel li {
+    padding: 3px;
+    padding-left: 10px;
+    margin: 0px 0;
+}
 
-.left-nav-panel li.selected-children { border-left:none; padding-left:10px; }
+.left-nav-panel a:link,
+.left-nav-panel a:visited {
+    color: #3c4689;
+}
+
+.left-nav-panel li.selected {
+    font-weight: bold;
+    text-decoration: none;
+    background-color: rgb(232, 235, 237);
+    border-radius: 2px;
+}
+
+.left-nav-panel li.selected a:link,
+.left-nav-panel li.selected a:visited {}
+
+.left-nav-panel li.selected-children {
+    border-left: none;
+    padding-left: 10px;
+}
 
 .content-panel {
-    padding:10px 40px !important;
+    padding: 10px 40px !important;
 }
+
 .content-main {
-    padding:0px 20px !important;
-    max-width:800px;
+    padding: 0px 20px !important;
+    max-width: 800px;
 }
 
-.content-main p { margin-bottom:18px; }
-.content-main h1 { margin-bottom:24px; }
+.content-main p {
+    margin-bottom: 18px;
+}
 
+.content-main h1 {
+    margin-bottom: 24px;
+}
+
+
+.left-nav-panel li.selected {
+    display: flex;
+    align-items: center;
+}
+
+
+.arrow {
+    border: solid #8a9bad;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    margin-top: 2.5px;
+    padding: 2.25px;
+    width: 1px;
+}
+
+.circle {
+    border: solid #8a9bad;
+    border-width: 2px 2px 2px 2px;
+    display: inline-block;
+    margin-top: 2.5px;
+    padding: 1.125px;
+    width: 1px;
+    border-radius: 4px;
+}
+
+.right {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+}
+
+.down {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+}

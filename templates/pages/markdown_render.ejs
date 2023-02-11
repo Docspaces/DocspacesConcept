@@ -57,26 +57,35 @@
                     <li>
                         <ul>
                             <% if (related.parentPage !=null) { %>
-                                <li><a href="<%= related.parentPage %>"><%= related.parentPage.substring(related.parentPage.lastIndexOf('/') + 1) %></a></li>
+                                <li><div class="arrow down" style="margin-right:10px;"></div>
+                                    <a href="<%= related.parentPage %>"><%= related.parentPage.substring(related.parentPage.lastIndexOf('/') + 1) %></a></li>
                                 <li>
                                     <ul>
                             <% } %>
 
                             <% for(var i=0; i < related.siblings.length; i++) { %>
                                 <% if (related.siblings[i].path == pagePath) { %>
-                                    <li class="selected"><a href="<%= related.siblings[i].path %>"><%= related.siblings[i].path.substring(related.siblings[i].path.lastIndexOf('/') + 1) %></a></li>
+                                    <li class="selected"><div class="arrow down" style="margin-right:10px;"></div>
+                                        <a href="<%= related.siblings[i].path %>"><%= related.siblings[i].path.substring(related.siblings[i].path.lastIndexOf('/') + 1) %></a>
+                                    </li>
 
                                     <% if (related.children !=null && related.children.length> 0) { %>
                                     <li class="selected-children">
                                         <ul>
                                             <% for(var j=0; j < related.children.length; j++) { %>
-                                                <li><a href="<%= related.children[j].path %>"><%= related.children[j].path.substring(related.children[j].path.lastIndexOf('/') + 1) %></a></li>
+                                                <li>
+                                                    <div class="circle" style="margin-right:10px;"></div>
+                                                    <a href="<%= related.children[j].path %>"><%= related.children[j].path.substring(related.children[j].path.lastIndexOf('/') + 1) %></a>
+                                                </li>
                                             <% } %>
                                         </ul>
                                     </li>
                                     <% } %>
                                 <% } else { %>
-                                    <li><a href="<%= related.siblings[i].path %>"><%= related.siblings[i].path.substring(related.siblings[i].path.lastIndexOf('/')+ 1) %></a></li>
+                                    <li>
+                                        <div class="arrow right" style="margin-right:10px;"></div>
+                                        <a href="<%= related.siblings[i].path %>"><%= related.siblings[i].path.substring(related.siblings[i].path.lastIndexOf('/')+ 1) %></a>
+                                    </li>
                                 <% } %>
                             <% } %>
 
@@ -101,10 +110,18 @@
                             <!--<button class="toolbar_button">Create</button>-->
                             <a href="#">Favourite</a>
                         </div>
+        
+
                     </div>
     
 
                     <%- output %>
+
+                    <p style="margin:40px 0 40px 0; font-size:14px; color: #777">
+    
+                        All content &copy; Arctus Limited 2023
+                        
+                    </p>
                 </div>
             </div>
         </div>

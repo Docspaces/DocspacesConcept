@@ -6,6 +6,7 @@ const ejs = require('ejs');
 const hljs = require('highlight.js');
 
 var db = null;
+var middleware = null;
 
 // Markdown rendering library
 const marked = require('marked')
@@ -96,6 +97,23 @@ router.get('/index', (req, res) => {
 
 let wikiRouteRegex = /^\/[a-zA-Z0-9%\/\-]*$/
 
+router.get(wikiRouteRegex, (req, res, next) => {
+
+  console.log("---");  
+  console.log("Pre-load");  
+  
+  console.log(req.session.userId == undefined ? "Not logged in" : "Logged in as " + req.session.userId);
+  console.log("Domain is "+ req.hostname);
+  console.log("Url is "+ req.url);
+  console.log("---");
+
+//  req.session.userId = 123;
+
+  //res.status = 401;
+  return next();// "DENIED");
+
+});
+
 router.get(wikiRouteRegex, (req, res) => {
 
   console.log('GET ' + req._parsedUrl.pathname)
@@ -182,7 +200,8 @@ router.post(wikiRouteRegex, (req, res) => {
 
 });
 
-module.exports = (db) => {
+module.exports = (db, middleware) => {
   this.db = db;
+  this.middleware = middleware;
   return router;
 }
