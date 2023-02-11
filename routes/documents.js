@@ -105,16 +105,7 @@ router.get("/diagrams/:id/edit", (req, res) => {
   
       data.diagrams = rows
   
-      ejs.renderFile('./templates/document_index.ejs', data, options, function (err, str) {
-        if (err) {
-          res.status(500);
-          res.send(err.message);
-        }
-        else {
-          res.status(200);
-          res.send(str);
-        }
-      });
+      
   
   });
   

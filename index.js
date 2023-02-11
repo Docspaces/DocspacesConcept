@@ -9,6 +9,7 @@ const a = require("./middleware/auth");
 const db = require("./database/sqlite_database")("test.db");
 const pageRoutes = require("./routes/pages")(db, a.authorize);
 const documentRoutes = require("./routes/documents")(db);
+const adminRoutes = require("./routes/admin")(db);
 
 const app = express();
 
@@ -37,6 +38,7 @@ const myLogger = function (req, res, next) {
 
 
 app.use("/", documentRoutes);
+app.use("/", adminRoutes);
 app.use("/", pageRoutes);
 app.use("/", express.static(__dirname + "/static"));
 
