@@ -20,6 +20,8 @@ router.get("/admin/users", (req, res) => {
         contentForNav = str;
     });
 
+    let users = db
+
     ejs.renderFile('./templates/admin/users.ejs', {}, options, function (err, str) {
         contentForMain = str;
     });

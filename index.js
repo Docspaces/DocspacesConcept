@@ -6,10 +6,13 @@ const bodyParser = require("body-parser");
 
 const a = require("./middleware/auth");
 
-const db = require("./database/sqlite_database")("test.db");
+const db = require("./database/postgres_database")();
+
+//const db = require("./database/sqlite_database")("test.db");
 const pageRoutes = require("./routes/pages")(db, a.authorize);
 const documentRoutes = require("./routes/documents")(db);
 const adminRoutes = require("./routes/admin")(db);
+const loginRoutes = require("./routes/login")(db);
 
 const app = express();
 
@@ -36,9 +39,9 @@ const myLogger = function (req, res, next) {
 }
 //app.use(a.authorize);
 
-
-app.use("/", documentRoutes);
+app.use("/", loginRoutes);
 app.use("/", adminRoutes);
+app.use("/", documentRoutes);
 app.use("/", pageRoutes);
 app.use("/", express.static(__dirname + "/static"));
 

@@ -1,15 +1,15 @@
 
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-
-const ejs = require('ejs');
-const hljs = require('highlight.js');
+const uuid = require("uuid");
+const ejs = require("ejs");
+const hljs = require("highlight.js");
 
 var db = null;
 var middleware = null;
 
 // Markdown rendering library
-const marked = require('marked')
+const marked = require("marked")
 
 marked.setOptions({
   highlight: function (code, lang) {
@@ -59,14 +59,14 @@ const DOMPurify = createDOMPurify(window)
 
 /////
 
-router.get('/pages/:id/fetch', (req, res) => {
+router.get('/pages/:id/fetch', async (req, res) => {
 
   var data = {}
   var options = {}
 
   if (req.params.id != '0') {
 
-    var row = this.db.get_page_by_id(req.params.id);
+    var row = await this.db.get_page_by_id(req.params.id);
 
     res.status(200);
     res.send(row);
@@ -77,7 +77,7 @@ router.get('/pages/:id/fetch', (req, res) => {
   }
 });
 
-router.get('/index', (req, res) => {
+router.get('/index', async (req, res) => {
 
   var data = {}
   var options = {}
@@ -87,11 +87,22 @@ router.get('/index', (req, res) => {
     pagePath = pagePath.substring(0, pagePath.length - 1);
   }
 
-  var rows = this.db.get_all_pages_for_index(pagePath);
+  try {
+    var rows = await this.db.get_all_pages_for_index();
 
-  ejs.renderFile('./templates/page_index.ejs', { pages: rows }, options, function (err, str) {
-    res.send(str)
-  });
+    ejs.renderFile('./templates/page_index.ejs', { pages: rows }, options, function (err, str) {
+      if (err) {
+        console.log("ERROR: " + err);
+      }
+      res.send(str);
+    });
+  }
+  catch (e) {
+    console.log("ERROR!!! " + e);
+    ejs.renderFile('./templates/error.ejs', {}, {}, function (err, str) {
+      res.send(str);
+    });
+  }
 
 });
 
@@ -100,11 +111,20 @@ let wikiRouteRegex = /^\/[a-zA-Z0-9%\/\-]*$/
 router.get(wikiRouteRegex, (req, res, next) => {
 
   console.log("---");  
-  console.log("Pre-load");  
-  
-  console.log(req.session.userId == undefined ? "Not logged in" : "Logged in as " + req.session.userId);
+  console.log("Pre-flight for the page handler");  
+  console.log(req.session.userId == undefined ? "Not logged in" : "Logged in with user id " + req.session.userId);
   console.log("Domain is "+ req.hostname);
   console.log("Url is "+ req.url);
+
+  console.log("Organisation is ");
+  console.log("Worksapce is ");
+  console.log("Area is ");
+  console.log("Page is ");
+
+  let page_context = {
+    organisation_id: uuid.NIL
+  };
+
   console.log("---");
 
 //  req.session.userId = 123;
@@ -114,7 +134,7 @@ router.get(wikiRouteRegex, (req, res, next) => {
 
 });
 
-router.get(wikiRouteRegex, (req, res) => {
+router.get(wikiRouteRegex, async (req, res) => {
 
   console.log('GET ' + req._parsedUrl.pathname)
 
@@ -123,8 +143,9 @@ router.get(wikiRouteRegex, (req, res) => {
     pagePath = pagePath.substring(0, pagePath.length - 1);
   }
 
-  var row = this.db.get_page_for_path(pagePath);
-  var related = this.db.get_navigation_links_for_current_page(pagePath);
+  var row = await this.db.get_page_for_path(pagePath);
+
+  var related = { siblings: [], children: [], parent: null } // await this.db.get_navigation_links_for_current_page(pagePath);
 
   var pageData = '';
   var pageId = 0;
@@ -185,7 +206,7 @@ router.get(wikiRouteRegex, (req, res) => {
 });
 
 // This processes the same URLs as the .get method, but this is for post-back only, so when the user is trying to update
-router.post(wikiRouteRegex, (req, res) => {
+router.post(wikiRouteRegex, async (req, res) => {
 
   console.log('POST ' + req._parsedUrl.pathname)
 
@@ -194,7 +215,7 @@ router.post(wikiRouteRegex, (req, res) => {
     pagePath = pagePath.substring(0, pagePath.length - 1);
   }
 
-  this.db.update_page_at_path(pagePath, req.body.content);
+  await this.db.update_page_at_path(pagePath, req.body.content);
 
   res.redirect(req._parsedUrl.pathname);
 

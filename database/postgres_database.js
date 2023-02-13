@@ -1,23 +1,21 @@
-class SqliteDatabase {
+class PostgresDatabase {
+
     constructor(db) {
         this.db = db;
-    }
-
-    migrate() {
-        this.db.prepare('CREATE TABLE IF NOT EXISTS diagrams (id integer primary key autoincrement, name text not null, data text not null, type varchar(50) not null)').run();
-        this.db.prepare('CREATE TABLE IF NOT EXISTS pages (id integer primary key autoincrement, path text not null unique, data text not null)').run();
-        this.db.prepare('CREATE TABLE IF NOT EXISTS organisation (id integer primary key autoincrement, path text not null unique, data text not null)').run();
+        this.uuid = require("uuid");
     }
 
     get_page_by_id(page_id) {
         return this.db.prepare("SELECT id, path, data FROM pages WHERE id = ?").get(page_id);
     }
 
-    get_page_for_path(path) {
-        return this.db.prepare("SELECT * FROM pages WHERE path = ?").get(path);
+    async get_page_for_path(path) {
+        var result = await this.db.query("select * from get_page_at_path($1::uuid, $2::uuid, $3::uuid, $4::uuid, $5::text)", [this.uuid.NIL, this.uuid.NIL, this.uuid.NIL, this.uuid.NIL, path]);
+
+        return result.rows[0];
     }
 
-    update_page_at_path(path, page_data) {
+    async update_page_at_path(path, page_data) {
         this.db.prepare("INSERT INTO pages (path, data) \
             VALUES(?, ?) \
             ON CONFLICT(path) DO UPDATE SET \
@@ -45,7 +43,6 @@ class SqliteDatabase {
     }
 
     get_navigation_links_for_current_page(current_page) {
-        //console.log('get_navigation_links_for_current_page('+current_page+')');
 
         var results = {}
         results.siblings = [];
@@ -73,12 +70,7 @@ class SqliteDatabase {
             results.parentPage = null;
 
             results.siblings = this.db.prepare("SELECT id, path FROM pages WHERE path not like '/' and path like ? and path not like ? ORDER BY path")
-            .all("/%", "/%/%");
-                // this.db.prepare("SELECT id, path FROM pages WHERE path like ?")
-                //.all("/");
- 
-            //results.children = this.db.prepare("SELECT id, path FROM pages WHERE path like ? and path not like ? ORDER BY path")
-            //     .all("/%", "/%/%");
+                .all("/%", "/%/%");
         }
 
 
@@ -86,27 +78,57 @@ class SqliteDatabase {
         return results;
     }
 
-    get_all_pages_for_index() {
-        return this.db.prepare("SELECT id, path FROM pages ORDER BY path").all();
+    async get_all_pages_for_index(user_id, organisation_id, workspace_id, area_id) {
+        var result = await this.db.query("select * from get_page_index($1::uuid, $2::uuid, $3::uuid)", [this.uuid.NIL, this.uuid.NIL, this.uuid.NIL]);
+
+        return result.rows;
     }
 
 
 
-    admin_get_users(organisation) {
-        return this.db.prepare("SELECT id, email, name FROM users ORDER BY name").all();
+    async admin_get_users(organisation) {
+        var result = await this.db.query("SELECT id, email, name FROM users ORDER BY name");
+
+        return result.rows;
+    }
+
+    async get_user_for_auth(email, organisation_id) {
+        var result = await this.db.query("select * from get_user_for_auth($1::text, $2::uuid)",
+            [email, organisation_id]);
+
+        if (result.rows.length == 1) {
+            return result.rows[0];
+        }
+        else {
+            return {};
+        }
     }
 
 }
 
 
-module.exports = (file) => {
+module.exports = () => {
     
-    let sqlite = require('better-sqlite3')(file, {});
-    sqlite.pragma('journal_mode = WAL');
+    let { Pool } = require('pg')
+ 
+    const pool = new Pool({
+        user: 'docspaces_website_user',
+        host: 'localhost',
+        database: 'docspaces_dev',
+        password: 'secretpassword',
+        port: 5432,
+    })
+ /*
+    console.log('db code 1');
 
-    let db = new SqliteDatabase(sqlite);
+    pool.query('SELECT NOW()', (err, res) => {
+        console.log(err, res)
+        pool.end()
+    })
 
-    db.migrate();
+    console.log('db code 2');
+*/
+    let db = new PostgresDatabase(pool);
 
     return db;
 }
