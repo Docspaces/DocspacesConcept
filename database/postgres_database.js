@@ -5,12 +5,33 @@ class PostgresDatabase {
         this.uuid = require("uuid");
     }
 
+    get_pool_object() {
+        return this.db;
+    }
+
     get_page_by_id(page_id) {
         return this.db.prepare("SELECT id, path, data FROM pages WHERE id = ?").get(page_id);
     }
 
-    async get_page_for_path(path) {
-        var result = await this.db.query("select * from get_page_at_path($1::uuid, $2::uuid, $3::uuid, $4::uuid, $5::text)", [this.uuid.NIL, this.uuid.NIL, this.uuid.NIL, this.uuid.NIL, path]);
+    async get_page_for_url(url, organisation_id, workspace_id, area_id, user_id) {
+        var result = await this.db.query(`
+          select * from 
+            get_page_for_url(
+              $1::varchar,
+              $2::uuid,
+              $3::uuid,
+              $4::uuid,
+              $5::uuid
+            )
+        `,
+          [
+            url,
+            organisation_id,
+            workspace_id,
+            area_id,
+            user_id
+          ]
+        );
 
         return result.rows[0];
     }
@@ -85,6 +106,12 @@ class PostgresDatabase {
     }
 
 
+    async get_page_data(page_id, organisation_id, user_id) {
+        var result = await this.db.query("select * from get_page_data($1::uuid, $2::uuid, $3::uuid)",
+            [page_id, organisation_id, user_id]);
+
+        return result.rows[0].get_page_data;
+    }
 
     async admin_get_users(organisation) {
         var result = await this.db.query("SELECT id, email, name FROM users ORDER BY name");
@@ -103,6 +130,132 @@ class PostgresDatabase {
             return {};
         }
     }
+
+    async get_organisation_for_domain(domain) {
+        var result = await this.db.query("select * from get_organisation_for_domain(p_domain := $1::text)", [domain]);
+
+        if (result.rows.length == 1) {
+            return result.rows[0];
+        }
+        else {
+            return {};
+        }
+    }
+
+    async get_workspace_area_and_page_for_url_in_organisation(url, organisation_id) {
+
+        var result = await this.db.query("select * from get_workspace_area_and_page_for_url_in_organisation(p_domain := $1::text)", [domain]);
+
+        if (result.rows.length == 1) {
+            return result.rows[0];
+        }
+        else {
+            return {};
+        }
+    }
+
+    async get_workspace_for_organisation_with_verified_user(tag, organisation_id, user_id) {
+
+        var result = await this.db.query(`
+          select * from 
+            get_workspace_for_organisation_with_verified_user (
+              p_tag := $1::text,
+              p_organisation_id := $2::uuid, 
+              p_user_id := $3::uuid
+            )
+        `,
+            [
+                tag,
+                organisation_id, 
+                user_id
+            ]
+        );
+
+        if (result.rows.length == 1) {
+            return result.rows[0];
+        }
+        else {
+            return undefined;
+        }
+    }
+
+    async get_default_workspace_for_organisation_with_verified_user(organisation_id, user_id) {
+
+        var result = await this.db.query(`
+          select * from 
+            get_default_workspace_for_organisation_with_verified_user (
+              p_organisation_id := $1::uuid, 
+              p_user_id := $2::uuid
+            )
+        `,
+            [
+                organisation_id, 
+                user_id
+            ]
+        );
+
+        if (result.rows.length == 1) {
+            return result.rows[0];
+        }
+        else {
+            return undefined;
+        }
+    }
+    
+
+
+    async get_area_for_workspace_with_verified_user(tag, workspace_id, organisation_id, user_id) {
+
+        var result = await this.db.query(`
+          select * from 
+            get_area_for_workspace_with_verified_user (
+              p_tag := $1::text,
+              p_workspace_id := $2::uuid,
+              p_organisation_id := $3::uuid, 
+              p_user_id := $4::uuid
+            )
+        `,
+            [
+                tag,
+                workspace_id,
+                organisation_id, 
+                user_id
+            ]
+        );
+
+        if (result.rows.length == 1) {
+            return result.rows[0];
+        }
+        else {
+            return undefined;
+        }
+    }
+
+    async get_default_area_for_workspace_with_verified_user(workspace_id, organisation_id, user_id) {
+
+        var result = await this.db.query(`
+          select * from 
+            get_default_area_for_workspace_with_verified_user (
+              p_workspace_id := $1::uuid,
+              p_organisation_id := $2::uuid, 
+              p_user_id := $3::uuid
+            )
+        `,
+            [
+                workspace_id,
+                organisation_id, 
+                user_id
+            ]
+        );
+
+        if (result.rows.length == 1) {
+            return result.rows[0];
+        }
+        else {
+            return undefined;
+        }
+    }
+    
 
 }
 

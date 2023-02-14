@@ -36,6 +36,8 @@ router.post("/login", async (req, res) => {
 
     var user_to_authenticate = await this.db.get_user_for_auth(req.body.email, u.NIL); // TODO: Fix orgid if it's on a domain...
 
+    console.log(user_to_authenticate);
+
 /*
 Example payload
 {
